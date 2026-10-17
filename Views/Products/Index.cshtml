@@ -3,54 +3,96 @@
 
 @{
     ViewData["Title"] = "Điện thoại và phụ kiện";
-    var culture = System.Globalization.CultureInfo.GetCultureInfo("vi-VN");
+    var culture = CultureInfo.GetCultureInfo("vi-VN");
 }
 
 <div class="py-4">
-    <h1 class="fw-bold">Is the man listening ?</h1>
-    <p class="text-muted">
-        PRIVACY SOLD HERE !
-    </p>
+    <div class="mb-5">
+        <h1 class="display-5 fw-bold">Điện thoại và phụ kiện</h1>
+        <p class="lead text-muted">
+            Khám phá điện thoại và phụ kiện phù hợp với bạn.
+        </p>
+    </div>
 
     @if (!Model.Any())
     {
-        <p class="mt-4">Chưa có sản phẩm để hiển thị.</p>
+        <div class="alert alert-light border">
+            Chưa có sản phẩm. Bạn quay lại sau nhé!
+        </div>
     }
     else
     {
-        <div class="row g-4 mt-2">
+        <div class="row g-4">
             @foreach (var product in Model)
             {
+                var coverImage = product.Images
+       .OrderByDescending(i => i.IsPrimary)
+       .ThenBy(i => i.DisplayOrder)
+       .FirstOrDefault();
+
+                
                 <div class="col-12 col-sm-6 col-lg-4">
                     <article class="card h-100 border-0 shadow-sm">
-                        <div class="bg-light rounded-top d-flex
-                            align-items-center justify-content-center"
-                             style="height: 220px;">
-                            <span class="text-muted">Chưa có ảnh sản phẩm</span>
-                        </div>
+                        <a asp-controller="Products"
+                           asp-action="Details"
+                           asp-route-id="@product.Id"
+                           aria-label="Xem chi tiết @product.Name"
+                           class="text-decoration-none">
+
+                            <div class="bg-white d-flex align-items-center
+                                justify-content-center rounded-top"
+                                 style="height: 260px;">
+
+                                @if (coverImage != null)
+                                {
+                                    <img src="@Url.Content(coverImage.ImageUrl)"
+                                         alt="@(coverImage.AltText ?? product.Name)"
+                                         loading="lazy"
+                                         style="width: 100%; height: 100%;
+                                    object-fit: contain; padding: 20px;" />
+                                }
+                                else
+                                {
+                                    <span class="text-muted">
+                                        Chưa có ảnh sản phẩm
+                                    </span>
+                                }
+                            </div>
+                        </a>
 
                         <div class="card-body p-4">
-                            <p class="small text-muted mb-2">
+                            <p class="text-muted small mb-2">
                                 @product.Brand.Name
                             </p>
 
-                            <h2 class="h5">@product.Name</h2>
+                            <h2 class="h5">
+                                <a asp-controller="Products"
+                                   asp-action="Details"
+                                   asp-route-id="@product.Id"
+                                   class="text-decoration-none text-dark">
+                                    @product.Name
+                                </a>
+                            </h2>
 
                             <p class="text-muted small">
                                 @product.ShortDescription
                             </p>
 
                             <p class="fs-5 fw-bold mb-2">
-                                @(product.Price.ToString("N0", culture)) ₫
+                                @product.Price.ToString("N0", culture) ₫
                             </p>
 
                             @if (product.StockQuantity > 0)
                             {
-                                <span class="small text-success">Còn hàng</span>
+                                <span class="small text-success">
+                                    Còn hàng
+                                </span>
                             }
                             else
                             {
-                                <span class="small text-secondary">Hết hàng</span>
+                                <span class="small text-secondary">
+                                    Tạm hết hàng
+                                </span>
                             }
                         </div>
                     </article>

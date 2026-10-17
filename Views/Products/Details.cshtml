@@ -1,0 +1,211 @@
+﻿@model CCMobile.Models.Product
+@using System.Globalization
+
+@{
+    ViewData["Title"] = Model.Name;
+    var culture = CultureInfo.GetCultureInfo("vi-VN");
+    var images = Model.Images
+        .OrderByDescending(i => i.IsPrimary)
+        .ThenBy(i => i.DisplayOrder)
+        .ToList();
+
+    var mainImage = images.FirstOrDefault();
+    var specs = Model.PhoneSpecification;
+}
+
+<div class="cc-details">
+    <nav aria-label="Đường dẫn" class="mb-4">
+        <a asp-controller="Products" asp-action="Index"
+           class="cc-back">
+            ← Điện thoại và phụ kiện
+        </a>
+    </nav>
+
+    <div class="row g-4 g-lg-5 align-items-start">
+        <div class="col-lg-7">
+            <div class="cc-gallery">
+                @if (mainImage != null)
+                {
+                    <img id="product-main-image"
+                         src="@Url.Content(mainImage.ImageUrl)"
+                         alt="@(mainImage.AltText ?? Model.Name)"
+                         class="cc-main-image" />
+                }
+                else
+                {
+                    <div class="cc-image-placeholder">
+                        Ảnh sản phẩm đang được cập nhật
+                    </div>
+                }
+            </div>
+
+            @if (images.Count > 1)
+            {
+                <div class="cc-thumbnails mt-3"
+                     aria-label="Ảnh sản phẩm">
+                    @foreach (var image in images)
+                    {
+                        <button type="button"
+                                class="cc-thumbnail"
+                                data-image="@Url.Content(image.ImageUrl)"
+                                data-alt="@(image.AltText ?? Model.Name)"
+                                aria-label="Xem ảnh @(image.AltText ?? Model.Name)">
+                            <img src="@Url.Content(image.ImageUrl)"
+                                 alt=""
+                                 loading="lazy" />
+                        </button>
+                    }
+                </div>
+            }
+        </div>
+
+        <div class="col-lg-5">
+            <p class="cc-eyebrow">@Model.Brand.Name</p>
+            <h1 class="cc-product-title">@Model.Name</h1>
+            <p class="text-muted small">Mã sản phẩm: @Model.Sku</p>
+
+            <p class="cc-price">
+                @Model.Price.ToString("N0", culture) ₫
+            </p>
+
+            @if (Model.StockQuantity > 0)
+            {
+                <span class="cc-stock">Còn hàng</span>
+            }
+            else
+            {
+                <span class="cc-stock cc-stock-out">Tạm hết hàng</span>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(Model.ShortDescription))
+            {
+                <p class="cc-summary">@Model.ShortDescription</p>
+            }
+
+            <dl class="cc-facts">
+                <div>
+                    <dt>Danh mục</dt>
+                    <dd>@Model.Category.Name</dd>
+                </div>
+
+                @if (!string.IsNullOrWhiteSpace(Model.Color))
+                {
+                    <div>
+                        <dt>Màu sắc</dt>
+                        <dd>@Model.Color</dd>
+                    </div>
+                }
+
+                <div>
+                    <dt>Bảo hành</dt>
+                    <dd>
+                        @(Model.WarrantyMonths > 0
+                            ? $"{Model.WarrantyMonths} tháng"
+                            : "Không áp dụng")
+                    </dd>
+                </div>
+            </dl>
+
+            @if (specs != null)
+            {
+                <a href="#specifications" class="cc-yellow-button">
+                    Xem thông số kỹ thuật ↓
+                </a>
+            }
+        </div>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(Model.Description))
+    {
+        <section class="cc-section">
+            <h2 class="cc-section-title">Về sản phẩm</h2>
+            <div class="cc-description">@Model.Description</div>
+        </section>
+    }
+
+    @if (specs != null)
+    {
+        <section id="specifications" class="cc-section">
+            <h2 class="cc-section-title">Thông số kỹ thuật</h2>
+
+            <div class="table-responsive">
+                <table class="table cc-spec-table mb-0">
+                    <caption class="visually-hidden">
+                        Thông số kỹ thuật của @Model.Name
+                    </caption>
+                    <tbody>
+                        <tr>
+                            <th scope="row">Chip xử lý</th>
+                            <td>@specs.Chipset</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">RAM</th>
+                            <td>@specs.RamGb GB</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Bộ nhớ</th>
+                            <td>@specs.StorageGb GB</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Màn hình</th>
+                            <td>
+                                @specs.ScreenSizeInches.ToString("0.#", culture) inch
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Độ phân giải</th>
+                            <td>@(specs.ScreenResolution ?? "Đang cập nhật")</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Tấm nền</th>
+                            <td>@(specs.PanelType ?? "Đang cập nhật")</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Tần số quét</th>
+                            <td>@(specs.RefreshRateHz?.ToString() is string hz ? $"{hz} Hz" : "Đang cập nhật")</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Camera sau</th>
+                            <td>@(specs.RearCamera ?? "Đang cập nhật")</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Camera trước</th>
+                            <td>@(specs.FrontCamera ?? "Đang cập nhật")</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Dung lượng pin</th>
+                            <td>@(specs.BatteryMah.HasValue ? $"{specs.BatteryMah} mAh" : "Đang cập nhật")</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Công suất sạc</th>
+                            <td>@(specs.ChargingWatts.HasValue ? $"{specs.ChargingWatts} W" : "Đang cập nhật")</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Hệ điều hành</th>
+                            <td>@(specs.OperatingSystem ?? "Đang cập nhật")</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Khối lượng</th>
+                            <td>@(specs.WeightGrams.HasValue ? $"{specs.WeightGrams.Value.ToString("0.#", culture)} g" : "Đang cập nhật")</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        document.querySelectorAll(".cc-thumbnail").forEach(button => {
+            button.addEventListener("click", () => {
+                const mainImage = document.getElementById("product-main-image");
+
+                if (mainImage) {
+                    mainImage.src = button.dataset.image;
+                    mainImage.alt = button.dataset.alt;
+                }
+            });
+        });
+    </script>
+}
