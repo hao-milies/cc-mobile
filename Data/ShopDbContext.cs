@@ -2,7 +2,8 @@
 {
     using Microsoft.EntityFrameworkCore;
     using CCMobile.Models;
-    public class ShopDbContext : DbContext
+    using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+    public class ShopDbContext : IdentityDbContext<ApplicationUser>
     {
         public ShopDbContext(DbContextOptions<ShopDbContext> options)
             : base(options)

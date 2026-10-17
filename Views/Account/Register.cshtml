@@ -1,0 +1,89 @@
+﻿@model CCMobile.ViewModels.RegisterViewModel
+
+@{
+    ViewData["Title"] = "Đăng ký tài khoản";
+}
+
+<div class="row justify-content-center py-5">
+    <div class="col-12 col-md-8 col-lg-5">
+        <section class="p-4 p-md-5 border rounded-3"
+                 style="background: #f7f3e8;">
+
+            <p class="small fw-bold mb-2">CC MOBILE</p>
+            <h1 class="h3 mb-2">Tạo tài khoản</h1>
+            <p class="text-muted mb-4">
+                Đăng ký để mua sắm và theo dõi đơn hàng.
+            </p>
+
+            <form asp-controller="Account"
+                  asp-action="Register"
+                  method="post">
+
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger mb-3"
+                     role="alert"></div>
+
+                <div class="mb-3">
+                    <label asp-for="FullName"
+                           class="form-label"></label>
+                    <input asp-for="FullName"
+                           class="form-control"
+                           autocomplete="name" />
+                    <span asp-validation-for="FullName"
+                          class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Email"
+                           class="form-label"></label>
+                    <input asp-for="Email"
+                           type="email"
+                           class="form-control"
+                           autocomplete="email" />
+                    <span asp-validation-for="Email"
+                          class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Password"
+                           class="form-label"></label>
+                    <input asp-for="Password"
+                           class="form-control"
+                           autocomplete="new-password"
+                           aria-describedby="password-help" />
+                    <div id="password-help" class="form-text">
+                        Từ 8 đến 100 ký tự, có chữ hoa,
+                        chữ thường và chữ số.
+                    </div>
+                    <span asp-validation-for="Password"
+                          class="text-danger small"></span>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="ConfirmPassword"
+                           class="form-label"></label>
+                    <input asp-for="ConfirmPassword"
+                           class="form-control"
+                           autocomplete="new-password" />
+                    <span asp-validation-for="ConfirmPassword"
+                          class="text-danger small"></span>
+                </div>
+
+                <button type="submit"
+                        class="btn btn-warning w-100 fw-semibold">
+                    Đăng ký
+                </button>
+            </form>
+
+            <a asp-controller="Products"
+               asp-action="Index"
+               class="d-inline-block mt-4 text-dark">
+                ← Quay lại cửa hàng
+            </a>
+        </section>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

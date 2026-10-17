@@ -4,6 +4,13 @@
 @{
     ViewData["Title"] = "Điện thoại và phụ kiện";
     var culture = CultureInfo.GetCultureInfo("vi-VN");
+    var search = ViewData["Search"] as string;
+}
+@if (TempData["SuccessMessage"] is string successMessage)
+{
+    <div class="alert alert-success" role="status">
+        @successMessage
+    </div>
 }
 
 <div class="py-4">
@@ -14,10 +21,84 @@
         </p>
     </div>
 
+    <form asp-controller="Products"
+          asp-action="Index"
+          method="get"
+          class="mb-4">
+
+        <div class="row g-3 align-items-end">
+            <div class="col-12 col-lg-5">
+                <label for="product-search" class="form-label">
+                    Tìm sản phẩm
+                </label>
+
+                <input id="product-search"
+                       name="search"
+                       type="search"
+                       value="@search"
+                       class="form-control"
+                       placeholder="Tên điện thoại hoặc mã sản phẩm..." />
+            </div>
+
+            <div class="col-6 col-lg-3">
+                <label for="brand-filter" class="form-label">
+                    Thương hiệu
+                </label>
+
+                <select id="brand-filter"
+                        name="brandId"
+                        asp-items="ViewBag.BrandOptions"
+                        class="form-select">
+                    <option value="">Tất cả thương hiệu</option>
+                </select>
+            </div>
+
+            <div class="col-6 col-lg-2">
+                <label for="sort-filter" class="form-label">
+                    Sắp xếp
+                </label>
+
+                <select id="sort-filter"
+                        name="sort"
+                        asp-items="ViewBag.SortOptions"
+                        class="form-select">
+                </select>
+            </div>
+
+            <div class="col-12 col-lg-2">
+                <button type="submit"
+                        class="btn btn-warning w-100 text-dark fw-semibold">
+                    Áp dụng
+                </button>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mt-3">
+            <span class="text-muted">
+                @Model.Count() sản phẩm
+            </span>
+
+            <a asp-controller="Products"
+               asp-action="Index"
+               class="text-dark">
+                Xóa bộ lọc
+            </a>
+        </div>
+    </form>
+
+    @if (!string.IsNullOrWhiteSpace(search))
+    {
+        <p class="text-muted">
+            Tìm thấy <strong>@Model.Count()</strong>
+            sản phẩm cho “@search”.
+        </p>
+    }
+
     @if (!Model.Any())
     {
         <div class="alert alert-light border">
-            Chưa có sản phẩm. Bạn quay lại sau nhé!
+            Không có sản phẩm phù hợp.
+            Hãy thử từ khóa khác hoặc xóa bộ lọc.
         </div>
     }
     else

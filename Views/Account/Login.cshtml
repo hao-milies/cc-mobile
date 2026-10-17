@@ -1,0 +1,81 @@
+﻿@model CCMobile.ViewModels.LoginViewModel
+
+@{
+    ViewData["Title"] = "Đăng nhập";
+}
+
+<div class="row justify-content-center py-5">
+    <div class="col-12 col-md-8 col-lg-5">
+        <section class="p-4 p-md-5 border rounded-3"
+                 style="background: #f7f3e8;">
+
+            <p class="small fw-bold mb-2">CC MOBILE</p>
+            <h1 class="h3 mb-4">Đăng nhập</h1>
+
+            @if (TempData["SuccessMessage"] is string message)
+            {
+                <div class="alert alert-success" role="status">
+                    @message
+                </div>
+            }
+
+            <form asp-controller="Account"
+                  asp-action="Login"
+                  method="post"
+                  novalidate>
+
+                <input asp-for="ReturnUrl" type="hidden" />
+
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger mb-3"
+                     role="alert"></div>
+
+                <div class="mb-3">
+                    <label asp-for="Email"
+                           class="form-label"></label>
+                    <input asp-for="Email"
+                           type="email"
+                           class="form-control"
+                           autocomplete="username" />
+                    <span asp-validation-for="Email"
+                          class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Password"
+                           class="form-label"></label>
+                    <input asp-for="Password"
+                           class="form-control"
+                           autocomplete="current-password" />
+                    <span asp-validation-for="Password"
+                          class="text-danger small"></span>
+                </div>
+
+                <div class="form-check mb-4">
+                    <input asp-for="RememberMe"
+                           class="form-check-input" />
+                    <label asp-for="RememberMe"
+                           class="form-check-label"></label>
+                </div>
+
+                <button type="submit"
+                        class="btn btn-warning w-100 fw-semibold">
+                    Đăng nhập
+                </button>
+            </form>
+
+            <p class="mt-4 mb-0">
+                Chưa có tài khoản?
+                <a asp-controller="Account"
+                   asp-action="Register"
+                   class="text-dark">
+                    Đăng ký
+                </a>
+            </p>
+        </section>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
