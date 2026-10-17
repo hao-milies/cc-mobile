@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
 	  <RootNamespace>CCMobile</RootNamespace>
+	  <UserSecretsId>5bf14271-a760-4072-ae50-754e84324691</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

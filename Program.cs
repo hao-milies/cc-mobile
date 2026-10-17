@@ -59,6 +59,9 @@ using (var scope = app.Services.CreateScope())
 
         DbInitializer.Initialize(db);
     }
+    await AdminAccountInitializer.InitializeAsync(
+    scope.ServiceProvider,
+    app.Configuration);
 }
 
 // Configure the HTTP request pipeline.
