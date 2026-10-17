@@ -4,6 +4,59 @@ namespace CCMobile.Data
 {
     public static class DbInitializer
     {
+        private static void EnsureSampleImages(ShopDbContext db, int productId)
+        {
+            var existingImages = db.ProductImages
+                .Where(i => i.ProductId == productId)
+                .ToList();
+
+            var samples = new[]
+            {
+        new
+        {
+            Url = "/images/products/phone-demo-front.jpg",
+            Alt = "Điện thoại mẫu nhìn từ phía trước",
+            Order = 0
+        },
+        new
+        {
+            Url = "/images/products/phone-demo-back.jpg",
+            Alt = "Điện thoại mẫu nhìn từ phía sau",
+            Order = 1
+        }
+    };
+
+            var hasPrimary = existingImages.Any(i => i.IsPrimary);
+
+            foreach (var sample in samples)
+            {
+                var image = existingImages
+                    .FirstOrDefault(i => i.ImageUrl == sample.Url);
+
+                if (image == null)
+                {
+                    image = new ProductImage
+                    {
+                        ProductId = productId,
+                        ImageUrl = sample.Url,
+                        AltText = sample.Alt,
+                        DisplayOrder = sample.Order,
+                        IsPrimary = false
+                    };
+
+                    db.ProductImages.Add(image);
+                    existingImages.Add(image);
+                }
+
+                if (!hasPrimary)
+                {
+                    image.IsPrimary = true;
+                    hasPrimary = true;
+                }
+            }
+
+            db.SaveChanges();
+        }
         public static void Initialize(ShopDbContext db)
         {
             const string sampleSku = "DEMO-PHONE-001";
@@ -18,9 +71,13 @@ namespace CCMobile.Data
             }
 
             // Không thêm trùng điện thoại mẫu.
-            if (db.Products.Any(p => p.Sku == sampleSku))
+            var existingProduct = db.Products
+    .FirstOrDefault(p => p.Sku == sampleSku);
+
+            if (existingProduct != null)
             {
                 db.SaveChanges();
+                EnsureSampleImages(db, existingProduct.Id);
                 return;
             }
 
@@ -85,6 +142,7 @@ namespace CCMobile.Data
 
             db.Products.Add(product);
             db.SaveChanges();
+            EnsureSampleImages(db, product.Id);
         }
     }
 }
