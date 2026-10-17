@@ -1,0 +1,61 @@
+﻿@model IEnumerable<CCMobile.Models.Product>
+@using System.Globalization
+
+@{
+    ViewData["Title"] = "Điện thoại và phụ kiện";
+    var culture = System.Globalization.CultureInfo.GetCultureInfo("vi-VN");
+}
+
+<div class="py-4">
+    <h1 class="fw-bold">Is the man listening ?</h1>
+    <p class="text-muted">
+        PRIVACY SOLD HERE !
+    </p>
+
+    @if (!Model.Any())
+    {
+        <p class="mt-4">Chưa có sản phẩm để hiển thị.</p>
+    }
+    else
+    {
+        <div class="row g-4 mt-2">
+            @foreach (var product in Model)
+            {
+                <div class="col-12 col-sm-6 col-lg-4">
+                    <article class="card h-100 border-0 shadow-sm">
+                        <div class="bg-light rounded-top d-flex
+                            align-items-center justify-content-center"
+                             style="height: 220px;">
+                            <span class="text-muted">Chưa có ảnh sản phẩm</span>
+                        </div>
+
+                        <div class="card-body p-4">
+                            <p class="small text-muted mb-2">
+                                @product.Brand.Name
+                            </p>
+
+                            <h2 class="h5">@product.Name</h2>
+
+                            <p class="text-muted small">
+                                @product.ShortDescription
+                            </p>
+
+                            <p class="fs-5 fw-bold mb-2">
+                                @(product.Price.ToString("N0", culture)) ₫
+                            </p>
+
+                            @if (product.StockQuantity > 0)
+                            {
+                                <span class="small text-success">Còn hàng</span>
+                            }
+                            else
+                            {
+                                <span class="small text-secondary">Hết hàng</span>
+                            }
+                        </div>
+                    </article>
+                </div>
+            }
+        </div>
+    }
+</div>
