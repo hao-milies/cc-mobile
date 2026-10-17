@@ -1,0 +1,119 @@
+﻿@model IEnumerable<CCMobile.Models.Product>
+@using System.Globalization
+
+@{
+    ViewData["Title"] = "Quản lý sản phẩm";
+    var culture = CultureInfo.GetCultureInfo("vi-VN");
+}
+
+<div class="py-4">
+    <a asp-controller="Admin"
+       asp-action="Index"
+       class="text-dark">
+        ← Trang quản trị
+    </a>
+
+    <h1 class="h3 mt-4">Quản lý sản phẩm</h1>
+    <a asp-action="Create"
+       class="btn btn-warning fw-semibold my-3">
+        + Thêm sản phẩm
+    </a>
+    <p class="text-muted">
+        Có @Model.Count() sản phẩm trong cửa hàng.
+    </p>
+
+    @if (TempData["SuccessMessage"] is string message)
+    {
+        <div class="alert alert-success" role="status">
+            @message
+        </div>
+    }
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-light border">
+            Chưa có sản phẩm.
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive border rounded">
+            <table class="table table-hover align-middle mb-0">
+                <caption class="visually-hidden">
+                    Danh sách sản phẩm dành cho quản trị viên
+                </caption>
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col">Sản phẩm</th>
+                        <th scope="col">Thương hiệu</th>
+                        <th scope="col">Danh mục</th>
+                        <th scope="col" class="text-end">Giá bán</th>
+                        <th scope="col" class="text-end">Tồn kho</th>
+                        <th scope="col">Trạng thái</th>
+                        <th scope="col">Thao tác</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var product in Model)
+                    {
+                        <tr>
+                            <td>
+                                <div class="fw-semibold">
+                                    @product.Name
+                                </div>
+                                <div class="small text-muted">
+                                    @product.Sku
+                                </div>
+                            </td>
+
+                            <td>@product.Brand.Name</td>
+                            <td>@product.Category.Name</td>
+
+                            <td class="text-end text-nowrap">
+                                @product.Price.ToString("N0", culture) ₫
+                            </td>
+
+                            <td class="text-end">
+                                @product.StockQuantity
+                            </td>
+
+                            <td>
+                                @if (product.IsActive)
+                                {
+                                    <span class="badge bg-success">
+                                        Đang hiển thị
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">
+                                        Đang ẩn
+                                    </span>
+                                }
+                            </td>
+
+                            <td>
+                                @if (product.IsActive)
+                                {
+                                    <a asp-controller="Products"
+                                       asp-action="Details"
+                                       asp-route-id="@product.Id"
+                                       class="btn btn-sm btn-outline-dark text-nowrap">
+                                        Xem trên cửa hàng
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="small text-muted">
+                                        Chưa công khai
+                                    </span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

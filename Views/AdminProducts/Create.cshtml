@@ -1,0 +1,170 @@
+﻿@model CCMobile.ViewModels.ProductFormViewModel
+
+@{
+    ViewData["Title"] = "Thêm sản phẩm";
+}
+
+<div class="py-4">
+    <a asp-action="Index" class="text-dark">
+        ← Quản lý sản phẩm
+    </a>
+
+    <h1 class="h3 mt-4 mb-4">Thêm sản phẩm</h1>
+
+    <form asp-controller="AdminProducts"
+          asp-action="Create"
+          method="post"
+          novalidate>
+
+        <div asp-validation-summary="ModelOnly"
+             class="text-danger mb-3"
+             role="alert"></div>
+
+        <div class="row g-4">
+            <div class="col-12 col-lg-8">
+                <div class="border rounded-3 p-4">
+                    <div class="mb-3">
+                        <label asp-for="Name"
+                               class="form-label"></label>
+                        <input asp-for="Name"
+                               class="form-control" />
+                        <span asp-validation-for="Name"
+                              class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Sku"
+                               class="form-label"></label>
+                        <input asp-for="Sku"
+                               class="form-control"
+                               placeholder="Ví dụ: PHONE-DEMO-002" />
+                        <span asp-validation-for="Sku"
+                              class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="ShortDescription"
+                               class="form-label"></label>
+                        <textarea asp-for="ShortDescription"
+                                  class="form-control"
+                                  rows="3"></textarea>
+                        <span asp-validation-for="ShortDescription"
+                              class="text-danger small"></span>
+                    </div>
+
+                    <div>
+                        <label asp-for="Description"
+                               class="form-label"></label>
+                        <textarea asp-for="Description"
+                                  class="form-control"
+                                  rows="7"></textarea>
+                        <span asp-validation-for="Description"
+                              class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-lg-4">
+                <div class="border rounded-3 p-4"
+                     style="background: #f7f3e8;">
+
+                    <div class="mb-3">
+                        <label asp-for="Price"
+                               class="form-label"></label>
+                        <input asp-for="Price"
+                               type="number"
+                               min="1"
+                               step="1"
+                               class="form-control"
+                               aria-describedby="price-help" />
+                        <div id="price-help" class="form-text">
+                            Nhập số liền, ví dụ: 12000000.
+                        </div>
+                        <span asp-validation-for="Price"
+                              class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="StockQuantity"
+                               class="form-label"></label>
+                        <input asp-for="StockQuantity"
+                               type="number"
+                               min="0"
+                               step="1"
+                               class="form-control" />
+                        <span asp-validation-for="StockQuantity"
+                              class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="CategoryId"
+                               class="form-label"></label>
+                        <select asp-for="CategoryId"
+                                asp-items="Model.CategoryOptions"
+                                class="form-select">
+                            <option value="">Chọn danh mục</option>
+                        </select>
+                        <span asp-validation-for="CategoryId"
+                              class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="BrandId"
+                               class="form-label"></label>
+                        <select asp-for="BrandId"
+                                asp-items="Model.BrandOptions"
+                                class="form-select">
+                            <option value="">Chọn thương hiệu</option>
+                        </select>
+                        <span asp-validation-for="BrandId"
+                              class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Color"
+                               class="form-label"></label>
+                        <input asp-for="Color"
+                               class="form-control" />
+                        <span asp-validation-for="Color"
+                              class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="WarrantyMonths"
+                               class="form-label"></label>
+                        <input asp-for="WarrantyMonths"
+                               type="number"
+                               min="0"
+                               max="120"
+                               step="1"
+                               class="form-control" />
+                        <span asp-validation-for="WarrantyMonths"
+                              class="text-danger small"></span>
+                    </div>
+
+                    <div class="form-check">
+                        <input asp-for="IsActive"
+                               class="form-check-input" />
+                        <label asp-for="IsActive"
+                               class="form-check-label"></label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex gap-3 mt-4">
+            <button type="submit"
+                    class="btn btn-warning fw-semibold px-4">
+                Lưu sản phẩm
+            </button>
+
+            <a asp-action="Index" class="btn btn-outline-dark">
+                Hủy
+            </a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
