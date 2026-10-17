@@ -81,19 +81,27 @@
                             <td>
                                 @if (product.IsActive)
                                 {
-                                    <span class="badge bg-success">
-                                        Đang hiển thị
-                                    </span>
+                                    <span class="badge bg-success">Đang hiển thị</span>
                                 }
                                 else
                                 {
-                                    <span class="badge bg-secondary">
-                                        Đang ẩn
-                                    </span>
+                                    <span class="badge bg-secondary">Đang ẩn</span>
                                 }
                             </td>
 
                             <td>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <a asp-action="Edit"
+                                       asp-route-id="@product.Id"
+                                       class="btn btn-sm btn-outline-dark">
+                                        Sửa
+                                    </a>
+
+                                    <a asp-action="UploadImage"
+                                       asp-route-id="@product.Id"
+                                       class="btn btn-sm btn-outline-dark">
+                                        Thêm ảnh
+                                    </a>
                                 @if (product.IsActive)
                                 {
                                     <a asp-controller="Products"

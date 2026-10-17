@@ -1,0 +1,69 @@
+﻿@model CCMobile.ViewModels.ProductImageUploadViewModel
+
+@{
+    ViewData["Title"] = "Thêm ảnh sản phẩm";
+}
+
+<div class="row justify-content-center py-4">
+    <div class="col-12 col-lg-7">
+        <a asp-action="Index" class="text-dark">
+            ← Quản lý sản phẩm
+        </a>
+
+        <h1 class="h3 mt-4">Thêm ảnh sản phẩm</h1>
+        <p class="text-muted">@Model.ProductName</p>
+
+        <form asp-controller="AdminProducts"
+              asp-action="UploadImage"
+              asp-route-id="@Model.ProductId"
+              method="post"
+              enctype="multipart/form-data"
+              novalidate>
+
+            <div asp-validation-summary="ModelOnly"
+                 class="text-danger mb-3"
+                 role="alert"></div>
+
+            <div class="mb-3">
+                <label asp-for="Image" class="form-label"></label>
+
+                <input asp-for="Image"
+                       type="file"
+                       accept=".jpg,.jpeg,.png"
+                       class="form-control"
+                       aria-describedby="image-help" />
+
+                <div id="image-help" class="form-text">
+                    Chọn ảnh JPG hoặc PNG, tối đa 2 MB.
+                </div>
+
+                <span asp-validation-for="Image"
+                      class="text-danger small"></span>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="AltText" class="form-label"></label>
+                <input asp-for="AltText"
+                       class="form-control"
+                       placeholder="Ví dụ: Mặt sau điện thoại màu đen" />
+
+                <span asp-validation-for="AltText"
+                      class="text-danger small"></span>
+            </div>
+
+            <button type="submit"
+                    class="btn btn-warning fw-semibold">
+                Lưu ảnh
+            </button>
+
+            <a asp-action="Index"
+               class="btn btn-outline-dark ms-2">
+                Hủy
+            </a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
