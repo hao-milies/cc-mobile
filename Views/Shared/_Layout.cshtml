@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -62,6 +62,15 @@
                                     Đăng ký
                                 </a>
                             </li>
+
+                        }
+
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Products" asp-action="Index">Sản phẩm</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Cart" asp-action="Index">Giỏ hàng</a>
+                        </li>
                             @if (User.IsInRole("Admin"))
                             {
                                 <li class="nav-item">
@@ -72,8 +81,6 @@
                                     </a>
                                 </li>
                             }
-                        }
-
                     </ul>
                 </div>
             </div>

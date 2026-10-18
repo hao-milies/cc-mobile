@@ -106,6 +106,26 @@
                 </div>
             </dl>
 
+            @if (Model.StockQuantity > 0)
+            {
+                <form asp-controller="Cart" asp-action="Add" method="post" class="my-4">
+                    <input type="hidden" name="productId" value="@Model.Id" />
+                    <label for="cart-quantity" class="form-label">Số lượng</label>
+                    <div class="d-flex gap-3">
+                        <input id="cart-quantity" name="quantity" type="number" value="1"
+                               min="1" max="@Math.Min(Model.StockQuantity, 99)" step="1" required
+                               class="form-control" style="width: 90px;" />
+                        <button type="submit" class="btn btn-warning fw-semibold flex-grow-1">
+                            Thêm vào giỏ hàng
+                        </button>
+                    </div>
+                </form>
+            }
+            else
+            {
+                <button type="button" class="btn btn-secondary w-100 my-4" disabled>Tạm hết hàng</button>
+            }
+
             @if (specs != null)
             {
                 <a href="#specifications" class="cc-yellow-button">

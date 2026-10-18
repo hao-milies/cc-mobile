@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using CCMobile.Data;
 using Microsoft.AspNetCore.Identity;
 using CCMobile.Models;
@@ -15,6 +15,15 @@ builder.Services.AddDbContext<ShopDbContext>(options =>
     options.UseSqlServer(connectionString));
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromHours(2);
+    options.Cookie.Name = ".CCMobile.CartSession";
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+    options.Cookie.SameSite = SameSiteMode.Lax;
+});
 builder.Services
     .AddIdentity<ApplicationUser, IdentityRole>(options =>
     {
@@ -58,10 +67,10 @@ using (var scope = app.Services.CreateScope())
             .GetRequiredService<ShopDbContext>();
 
         DbInitializer.Initialize(db);
+        await AdminAccountInitializer.InitializeAsync(
+            scope.ServiceProvider,
+            app.Configuration);
     }
-    await AdminAccountInitializer.InitializeAsync(
-    scope.ServiceProvider,
-    app.Configuration);
 }
 
 // Configure the HTTP request pipeline.
@@ -75,6 +84,7 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
+app.UseSession();
 
 app.UseAuthentication();
 app.UseAuthorization();
