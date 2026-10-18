@@ -59,6 +59,64 @@ namespace CCMobile.ViewModels
         [Display(Name = "Thương hiệu")]
         public int? BrandId { get; set; }
 
+
+        [Display(Name = "Có thông số điện thoại")]
+        public bool HasPhoneSpecification { get; set; }
+
+
+        [Display(Name = "Chip xử lý")]
+        [StringLength(200, ErrorMessage = "Chip xử lý tối đa 200 ký tự.")]
+        public string? PhoneChipset { get; set; }
+
+        [Display(Name = "RAM (GB)")]
+        [Range(1, 128, ErrorMessage = "RAM (GB) phải từ 1 đến 128.")]
+        public int? PhoneRamGb { get; set; }
+
+        [Display(Name = "Bộ nhớ (GB)")]
+        [Range(1, 8192, ErrorMessage = "Bộ nhớ (GB) phải từ 1 đến 8192.")]
+        public int? PhoneStorageGb { get; set; }
+
+        [Display(Name = "Màn hình (inch)")]
+        [Range(1, 15, ErrorMessage = "Màn hình (inch) phải từ 1 đến 15.")]
+        public double? PhoneScreenSizeInches { get; set; }
+
+        [Display(Name = "Độ phân giải")]
+        [StringLength(100, ErrorMessage = "Độ phân giải tối đa 100 ký tự.")]
+        public string? PhoneScreenResolution { get; set; }
+
+        [Display(Name = "Tấm nền")]
+        [StringLength(100, ErrorMessage = "Tấm nền tối đa 100 ký tự.")]
+        public string? PhonePanelType { get; set; }
+
+        [Display(Name = "Tần số quét (Hz)")]
+        [Range(1, 1000, ErrorMessage = "Tần số quét (Hz) phải từ 1 đến 1000.")]
+        public int? PhoneRefreshRateHz { get; set; }
+
+        [Display(Name = "Camera sau")]
+        [StringLength(300, ErrorMessage = "Camera sau tối đa 300 ký tự.")]
+        public string? PhoneRearCamera { get; set; }
+
+        [Display(Name = "Camera trước")]
+        [StringLength(200, ErrorMessage = "Camera trước tối đa 200 ký tự.")]
+        public string? PhoneFrontCamera { get; set; }
+
+        [Display(Name = "Dung lượng pin (mAh)")]
+        [Range(1, 50000, ErrorMessage = "Dung lượng pin (mAh) phải từ 1 đến 50000.")]
+        public int? PhoneBatteryMah { get; set; }
+
+        [Display(Name = "Công suất sạc (W)")]
+        [Range(1, 500, ErrorMessage = "Công suất sạc (W) phải từ 1 đến 500.")]
+        public int? PhoneChargingWatts { get; set; }
+
+        [Display(Name = "Hệ điều hành")]
+        [StringLength(100, ErrorMessage = "Hệ điều hành tối đa 100 ký tự.")]
+        public string? PhoneOperatingSystem { get; set; }
+
+        [Display(Name = "Khối lượng (g)")]
+        [Range(1, 2000, ErrorMessage = "Khối lượng (g) phải từ 1 đến 2000.")]
+        public double? PhoneWeightGrams { get; set; }
+
+
         // Controller sẽ lấy các lựa chọn này từ database.
         public List<SelectListItem> CategoryOptions { get; set; } = new();
 

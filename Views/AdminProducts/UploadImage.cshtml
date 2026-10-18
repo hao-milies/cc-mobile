@@ -1,69 +1,147 @@
 ﻿@model CCMobile.ViewModels.ProductImageUploadViewModel
-
 @{
     ViewData["Title"] = "Thêm ảnh sản phẩm";
 }
-
-<div class="row justify-content-center py-4">
-    <div class="col-12 col-lg-7">
-        <a asp-action="Index" class="text-dark">
-            ← Quản lý sản phẩm
-        </a>
-
-        <h1 class="h3 mt-4">Thêm ảnh sản phẩm</h1>
-        <p class="text-muted">@Model.ProductName</p>
-
-        <form asp-controller="AdminProducts"
-              asp-action="UploadImage"
-              asp-route-id="@Model.ProductId"
-              method="post"
-              enctype="multipart/form-data"
-              novalidate>
-
-            <div asp-validation-summary="ModelOnly"
-                 class="text-danger mb-3"
-                 role="alert"></div>
-
-            <div class="mb-3">
-                <label asp-for="Image" class="form-label"></label>
-
-                <input asp-for="Image"
-                       type="file"
-                       accept=".jpg,.jpeg,.png"
-                       class="form-control"
-                       aria-describedby="image-help" />
-
-                <div id="image-help" class="form-text">
-                    Chọn ảnh JPG hoặc PNG, tối đa 2 MB.
-                </div>
-
-                <span asp-validation-for="Image"
-                      class="text-danger small"></span>
-            </div>
-
-            <div class="mb-4">
-                <label asp-for="AltText" class="form-label"></label>
-                <input asp-for="AltText"
-                       class="form-control"
-                       placeholder="Ví dụ: Mặt sau điện thoại màu đen" />
-
-                <span asp-validation-for="AltText"
-                      class="text-danger small"></span>
-            </div>
-
-            <button type="submit"
-                    class="btn btn-warning fw-semibold">
-                Lưu ảnh
+<div class="py-4">
+    <a asp-action="Images" asp-route-id="@Model.ProductId" class="text-dark">← Quản lý ảnh</a>
+    <h1 class="h3 mt-4">Thêm ảnh sản phẩm</h1>
+    <p class="text-muted">@Model.ProductName</p>
+    <form id="upload-form" asp-controller="AdminProducts" asp-action="UploadImage"
+          asp-route-id="@Model.ProductId" method="post"
+          enctype="multipart/form-data" novalidate>
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+        <div class="border rounded-3 p-4 mb-4" style="background: #f7f3e8;">
+            <label asp-for="Images" class="form-label fw-semibold"></label>
+            <input asp-for="Images" id="image-input" type="file"
+                   accept=".jpg,.jpeg,.png" multiple class="form-control"
+                   aria-describedby="image-help" />
+            <p id="image-help" class="form-text mb-0">
+                Tối đa 10 ảnh JPG/PNG mỗi lần, mỗi ảnh không quá 2 MB.
+                Có thể chọn thêm ảnh nhiều lần.
+            </p>
+            <span asp-validation-for="Images" class="text-danger small d-block"></span>
+            <p id="selection-error" class="text-danger mt-2 mb-0" role="alert"></p>
+        </div>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <p id="selection-count" class="mb-0" aria-live="polite">Chưa chọn ảnh.</p>
+            <button id="clear-images" type="button"
+                    class="btn btn-sm btn-outline-dark" disabled>
+                Bỏ chọn tất cả
             </button>
-
-            <a asp-action="Index"
-               class="btn btn-outline-dark ms-2">
-                Hủy
-            </a>
-        </form>
-    </div>
+        </div>
+        <div id="image-previews" class="row g-3 mb-4"></div>
+        <p class="text-muted small">
+            Ảnh chỉ được lưu khi bấm “Tải ảnh lên”.
+            Nếu chưa có ảnh đại diện, ảnh đầu tiên sẽ được chọn.
+        </p>
+        <div class="d-flex gap-2">
+            <button id="upload-button" type="submit"
+                    class="btn btn-warning fw-semibold" disabled>
+                Tải ảnh lên
+            </button>
+            <a asp-action="Images" asp-route-id="@Model.ProductId" class="btn btn-outline-dark">Hủy</a>
+        </div>
+    </form>
 </div>
-
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+    <script>
+        (() => {
+            const input = document.getElementById("image-input");
+            const previews = document.getElementById("image-previews");
+            const count = document.getElementById("selection-count");
+            const error = document.getElementById("selection-error");
+            const clearButton = document.getElementById("clear-images");
+            const uploadButton = document.getElementById("upload-button");
+            let files = [];
+            let urls = [];
+
+            function releaseUrls() {
+                urls.forEach(url => URL.revokeObjectURL(url));
+                urls = [];
+            }
+
+            function render() {
+                const transfer = new DataTransfer();
+                files.forEach(file => transfer.items.add(file));
+                input.files = transfer.files;
+                releaseUrls();
+                previews.replaceChildren();
+                count.textContent = files.length
+                    ? "Đã chọn " + files.length + "/10 ảnh." : "Chưa chọn ảnh.";
+                clearButton.disabled = uploadButton.disabled = files.length === 0;
+
+                files.forEach((file, index) => {
+                    const col = document.createElement("div");
+                    col.className = "col-6 col-md-4 col-lg-3";
+                    const card = document.createElement("div");
+                    card.className = "border rounded-3 p-3 h-100";
+                    const img = document.createElement("img");
+                    const url = URL.createObjectURL(file);
+                    urls.push(url);
+                    img.src = url;
+                    img.alt = "Xem trước " + file.name;
+                    img.className = "w-100 rounded";
+                    img.style.height = "160px";
+                    img.style.objectFit = "contain";
+                    const name = document.createElement("p");
+                    name.className = "small text-break mt-3 mb-2";
+                    name.textContent = file.name;
+                    const size = document.createElement("p");
+                    size.className = "small text-muted";
+                    size.textContent = Math.ceil(file.size / 1024) + " KB";
+                    const remove = document.createElement("button");
+                    remove.type = "button";
+                    remove.className = "btn btn-sm btn-outline-danger";
+                    remove.textContent = "Bỏ ảnh";
+                    remove.setAttribute("aria-label", "Bỏ ảnh " + file.name);
+                    remove.addEventListener("click", () => {
+                        files.splice(index, 1);
+                        error.textContent = "";
+                        render();
+                    });
+                    card.append(img, name, size, remove);
+                    col.append(card);
+                    previews.append(col);
+                });
+            }
+
+            input.addEventListener("change", () => {
+                const incoming = Array.from(input.files);
+                const messages = [];
+                for (const file of incoming) {
+                    if (files.some(f => f.name === file.name &&
+                        f.size === file.size && f.lastModified === file.lastModified)) continue;
+                    if (!/\.(jpe?g|png)$/i.test(file.name)) {
+                        messages.push(file.name + ": chỉ nhận JPG/PNG.");
+                        continue;
+                    }
+                    if (!file.size || file.size > 2 * 1024 * 1024) {
+                        messages.push(file.name + ": dung lượng phải lớn hơn 0 và không quá 2 MB.");
+                        continue;
+                    }
+                    if (files.length >= 10) {
+                        messages.push("Mỗi lần chỉ được chọn tối đa 10 ảnh.");
+                        break;
+                    }
+                    files.push(file);
+                }
+                render();
+                error.textContent = messages.join(" ");
+            });
+
+            clearButton.addEventListener("click", () => {
+                files = [];
+                error.textContent = "";
+                render();
+            });
+
+            document.getElementById("upload-form").addEventListener("submit", event => {
+                if (!files.length) {
+                    event.preventDefault();
+                    error.textContent = "Vui lòng chọn ít nhất một ảnh.";
+                }
+            });
+            window.addEventListener("pagehide", releaseUrls);
+        })();
+    </script>
 }

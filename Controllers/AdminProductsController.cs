@@ -105,6 +105,8 @@ namespace CCMobile.Controllers
                     nameof(model.BrandId), "Thương hiệu không tồn tại.");
             }
 
+            ValidatePhoneSpecification(model);
+
             if (!ModelState.IsValid)
             {
                 await LoadOptionsAsync(model);
@@ -127,6 +129,7 @@ namespace CCMobile.Controllers
                 CreatedAt = DateTime.UtcNow
             };
 
+            ApplyPhoneSpecification(product, model);
             _db.Products.Add(product);
 
             try
@@ -169,143 +172,96 @@ namespace CCMobile.Controllers
             });
         }
 
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [RequestSizeLimit(3 * 1024 * 1024)]
+        [RequestSizeLimit(22 * 1024 * 1024)]
         public async Task<IActionResult> UploadImage(
-            int id,
-            ProductImageUploadViewModel model)
+            int id, ProductImageUploadViewModel model)
         {
-            var product = await _db.Products
-                .FirstOrDefaultAsync(p => p.Id == id);
-
-            if (product == null)
-            {
-                return NotFound();
-            }
+            var product = await _db.Products.FirstOrDefaultAsync(p => p.Id == id);
+            if (product == null) return NotFound();
 
             model.ProductId = product.Id;
             model.ProductName = product.Name;
 
-            var file = model.Image;
-            string? extension = null;
+            if (model.Images.Count == 0 || model.Images.Count > 10)
+                ModelState.AddModelError(nameof(model.Images),
+                    "Vui lòng chọn từ 1 đến 10 ảnh mỗi lần.");
 
-            if (file != null)
+            var validatedFiles = new List<(IFormFile File, string Extension)>();
+            if (model.Images.Count is >= 1 and <= 10)
             {
-                if (file.Length == 0 || file.Length > 2 * 1024 * 1024)
+                foreach (var file in model.Images)
                 {
-                    ModelState.AddModelError(
-                        nameof(model.Image),
-                        "Ảnh phải có dung lượng lớn hơn 0 và không quá 2 MB.");
-                }
-                else
-                {
-                    // Kiểm tra dấu hiệu định dạng trong nội dung file.
-                    // Không chỉ tin vào tên file hoặc ContentType gửi từ trình duyệt.
-                    var header = new byte[8];
-
-                    await using (var stream = file.OpenReadStream())
+                    if (file.Length == 0 || file.Length > 2 * 1024 * 1024)
                     {
-                        var total = 0;
-
-                        while (total < header.Length)
-                        {
-                            var read = await stream.ReadAsync(
-                                header.AsMemory(total, header.Length - total));
-
-                            if (read == 0)
-                            {
-                                break;
-                            }
-
-                            total += read;
-                        }
-
-                        if (total >= 3 &&
-                            header[0] == 0xFF &&
-                            header[1] == 0xD8 &&
-                            header[2] == 0xFF)
-                        {
-                            extension = ".jpg";
-                        }
-                        else if (total == 8 &&
-                            header.SequenceEqual(new byte[]
-                            {
-                        0x89, 0x50, 0x4E, 0x47,
-                        0x0D, 0x0A, 0x1A, 0x0A
-                            }))
-                        {
-                            extension = ".png";
-                        }
+                        ModelState.AddModelError(nameof(model.Images),
+                            $"Ảnh {file.FileName} phải lớn hơn 0 và không quá 2 MB.");
+                        continue;
                     }
-
+                    var extension = await GetImageExtensionAsync(file);
                     if (extension == null)
                     {
-                        ModelState.AddModelError(
-                            nameof(model.Image),
-                            "Chỉ nhận file ảnh JPEG hoặc PNG.");
+                        ModelState.AddModelError(nameof(model.Images),
+                            $"File {file.FileName} không có định dạng JPEG hoặc PNG.");
+                        continue;
                     }
+                    validatedFiles.Add((file, extension));
                 }
             }
 
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
+            if (!ModelState.IsValid) return View(model);
 
-            var directory = Path.Combine(
-                _environment.WebRootPath, "images", "products");
-
+            var directory = Path.Combine(_environment.WebRootPath, "images", "products");
             Directory.CreateDirectory(directory);
+            var existingImages = await _db.ProductImages
+                .Where(i => i.ProductId == product.Id).ToListAsync();
+            var nextOrder = existingImages.Count == 0
+                ? 0 : existingImages.Max(i => i.DisplayOrder) + 1;
+            var hasPrimary = existingImages.Any(i => i.IsPrimary);
+            var createdPaths = new List<string>();
 
-            // Tự sinh tên, không dùng tên file do người dùng gửi.
-            var fileName = $"{Guid.NewGuid():N}{extension}";
-            var filePath = Path.Combine(directory, fileName);
-
-            var images = await _db.ProductImages
-                .Where(i => i.ProductId == product.Id)
-                .ToListAsync();
-
-            var productImage = new ProductImage
-            {
-                ProductId = product.Id,
-                ImageUrl = $"/images/products/{fileName}",
-                AltText = string.IsNullOrWhiteSpace(model.AltText)
-                    ? product.Name
-                    : model.AltText.Trim(),
-                DisplayOrder = images.Count == 0
-                    ? 0
-                    : images.Max(i => i.DisplayOrder) + 1,
-                IsPrimary = !images.Any(i => i.IsPrimary)
-            };
-
+            await using var transaction = await _db.Database.BeginTransactionAsync();
             try
             {
-                await using (var output = new FileStream(
-                    filePath, FileMode.CreateNew))
+                foreach (var item in validatedFiles)
                 {
-                    await file!.CopyToAsync(output);
+                    var fileName = $"{Guid.NewGuid():N}{item.Extension}";
+                    var filePath = Path.Combine(directory, fileName);
+                    await using (var output = new FileStream(filePath, FileMode.CreateNew))
+                    {
+                        createdPaths.Add(filePath);
+                        await item.File.CopyToAsync(output);
+                    }
+                    _db.ProductImages.Add(new ProductImage
+                    {
+                        ProductId = product.Id,
+                        ImageUrl = $"/images/products/{fileName}",
+                        AltText = product.Name,
+                        DisplayOrder = nextOrder++,
+                        IsPrimary = !hasPrimary
+                    });
+                    hasPrimary = true;
                 }
-
-                _db.ProductImages.Add(productImage);
                 await _db.SaveChangesAsync();
+                await transaction.CommitAsync();
             }
             catch
             {
-                // Dọn file vừa tạo nếu không lưu thành công vào database.
-                if (System.IO.File.Exists(filePath))
+                await transaction.RollbackAsync();
+                foreach (var path in createdPaths)
                 {
-                    System.IO.File.Delete(filePath);
+                    if (System.IO.File.Exists(path)) System.IO.File.Delete(path);
                 }
-
                 throw;
             }
 
             TempData["SuccessMessage"] =
-                $"Đã thêm ảnh cho sản phẩm {product.Name}.";
-
-            return RedirectToAction(nameof(Index));
+                $"Đã thêm {validatedFiles.Count} ảnh cho sản phẩm {product.Name}.";
+            return RedirectToAction(nameof(Images), new { id = product.Id });
         }
+
         private async Task ValidateProductAsync(
     ProductFormViewModel model,
     int productId)
@@ -351,6 +307,7 @@ namespace CCMobile.Controllers
         public async Task<IActionResult> Edit(int id)
         {
             var product = await _db.Products
+                .Include(p => p.PhoneSpecification)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(p => p.Id == id);
 
@@ -374,6 +331,7 @@ namespace CCMobile.Controllers
                 BrandId = product.BrandId
             };
 
+            FillPhoneSpecification(model, product.PhoneSpecification);
             ViewData["ProductId"] = product.Id;
 
             await LoadOptionsAsync(model);
@@ -388,6 +346,7 @@ namespace CCMobile.Controllers
             ProductFormViewModel model)
         {
             var product = await _db.Products
+                .Include(p => p.PhoneSpecification)
                 .FirstOrDefaultAsync(p => p.Id == id);
 
             if (product == null)
@@ -398,6 +357,7 @@ namespace CCMobile.Controllers
             ViewData["ProductId"] = product.Id;
 
             await ValidateProductAsync(model, product.Id);
+            ValidatePhoneSpecification(model);
 
             if (!ModelState.IsValid)
             {
@@ -416,6 +376,7 @@ namespace CCMobile.Controllers
             product.IsActive = model.IsActive;
             product.CategoryId = model.CategoryId!.Value;
             product.BrandId = model.BrandId!.Value;
+            ApplyPhoneSpecification(product, model);
 
             try
             {
@@ -437,6 +398,187 @@ namespace CCMobile.Controllers
                 "Đã cập nhật sản phẩm thành công.";
 
             return RedirectToAction(nameof(Index));
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> Images(int id)
+        {
+            var product = await _db.Products.AsNoTracking()
+                .Include(p => p.Images)
+                .FirstOrDefaultAsync(p => p.Id == id);
+            if (product == null) return NotFound();
+            return View(product);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SetPrimaryImage(int id, int imageId)
+        {
+            await using var transaction = await _db.Database.BeginTransactionAsync(
+                System.Data.IsolationLevel.Serializable);
+            var images = await _db.ProductImages
+                .Where(i => i.ProductId == id).ToListAsync();
+            var selected = images.FirstOrDefault(i => i.Id == imageId);
+            if (selected == null) return NotFound();
+
+            // Lưu việc bỏ ảnh chính trước để không vi phạm chỉ mục duy nhất.
+            foreach (var image in images) image.IsPrimary = false;
+            await _db.SaveChangesAsync();
+            selected.IsPrimary = true;
+            await _db.SaveChangesAsync();
+            await transaction.CommitAsync();
+
+            TempData["SuccessMessage"] = "Đã cập nhật ảnh đại diện.";
+            return RedirectToAction(nameof(Images), new { id });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteImage(int id, int imageId)
+        {
+            await using var transaction = await _db.Database.BeginTransactionAsync(
+                System.Data.IsolationLevel.Serializable);
+            var images = await _db.ProductImages
+                .Where(i => i.ProductId == id).ToListAsync();
+            var selected = images.FirstOrDefault(i => i.Id == imageId);
+            if (selected == null) return NotFound();
+
+            var wasPrimary = selected.IsPrimary;
+            _db.ProductImages.Remove(selected);
+            await _db.SaveChangesAsync();
+
+            if (wasPrimary)
+            {
+                var replacement = images.Where(i => i.Id != imageId)
+                    .OrderBy(i => i.DisplayOrder).ThenBy(i => i.Id)
+                    .FirstOrDefault();
+                if (replacement != null)
+                {
+                    replacement.IsPrimary = true;
+                    await _db.SaveChangesAsync();
+                }
+            }
+
+            await transaction.CommitAsync();
+            // Chỉ gỡ bản ghi; giữ file để không ảnh hưởng nơi khác dùng cùng đường dẫn.
+            TempData["SuccessMessage"] = "Đã gỡ ảnh khỏi sản phẩm.";
+            return RedirectToAction(nameof(Images), new { id });
+        }
+
+
+        private void ValidatePhoneSpecification(ProductFormViewModel model)
+        {
+            if (!model.HasPhoneSpecification)
+            {
+                // Bỏ qua cả lỗi binding của các ô thông số không áp dụng.
+                foreach (var key in ModelState.Keys
+                    .Where(k => k.StartsWith("Phone", StringComparison.Ordinal)).ToList())
+                    ModelState.Remove(key);
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(model.PhoneChipset))
+                ModelState.AddModelError(nameof(model.PhoneChipset), "Vui lòng nhập chip xử lý.");
+
+            if (!model.PhoneRamGb.HasValue)
+                ModelState.AddModelError(nameof(model.PhoneRamGb), "Vui lòng nhập RAM.");
+            if (!model.PhoneStorageGb.HasValue)
+                ModelState.AddModelError(nameof(model.PhoneStorageGb), "Vui lòng nhập bộ nhớ.");
+            if (!model.PhoneScreenSizeInches.HasValue)
+                ModelState.AddModelError(nameof(model.PhoneScreenSizeInches), "Vui lòng nhập kích thước màn hình.");
+        }
+
+        private void ApplyPhoneSpecification(Product product, ProductFormViewModel model)
+        {
+            if (!model.HasPhoneSpecification)
+            {
+                if (product.PhoneSpecification != null)
+                {
+                    _db.Remove(product.PhoneSpecification);
+                    product.PhoneSpecification = null;
+                }
+                return;
+            }
+
+            var specs = product.PhoneSpecification ?? new PhoneSpecification();
+            specs.Chipset = model.PhoneChipset!.Trim();
+            specs.RamGb = model.PhoneRamGb!.Value;
+            specs.StorageGb = model.PhoneStorageGb!.Value;
+            specs.ScreenSizeInches = model.PhoneScreenSizeInches!.Value;
+            specs.ScreenResolution = model.PhoneScreenResolution?.Trim();
+            specs.PanelType = model.PhonePanelType?.Trim();
+            specs.RefreshRateHz = model.PhoneRefreshRateHz;
+            specs.RearCamera = model.PhoneRearCamera?.Trim();
+            specs.FrontCamera = model.PhoneFrontCamera?.Trim();
+            specs.BatteryMah = model.PhoneBatteryMah;
+            specs.ChargingWatts = model.PhoneChargingWatts;
+            specs.OperatingSystem = model.PhoneOperatingSystem?.Trim();
+            specs.WeightGrams = model.PhoneWeightGrams;
+            product.PhoneSpecification = specs;
+        }
+
+        private static void FillPhoneSpecification(
+            ProductFormViewModel model, PhoneSpecification? specs)
+        {
+            model.HasPhoneSpecification = specs != null;
+            if (specs == null) return;
+            model.PhoneChipset = specs.Chipset;
+            model.PhoneRamGb = specs.RamGb;
+            model.PhoneStorageGb = specs.StorageGb;
+            model.PhoneScreenSizeInches = specs.ScreenSizeInches;
+            model.PhoneScreenResolution = specs.ScreenResolution;
+            model.PhonePanelType = specs.PanelType;
+            model.PhoneRefreshRateHz = specs.RefreshRateHz;
+            model.PhoneRearCamera = specs.RearCamera;
+            model.PhoneFrontCamera = specs.FrontCamera;
+            model.PhoneBatteryMah = specs.BatteryMah;
+            model.PhoneChargingWatts = specs.ChargingWatts;
+            model.PhoneOperatingSystem = specs.OperatingSystem;
+            model.PhoneWeightGrams = specs.WeightGrams;
+        }
+
+        private static async Task<string?> GetImageExtensionAsync(
+            IFormFile file)
+        {
+            var header = new byte[8];
+
+            await using var stream = file.OpenReadStream();
+
+            var total = 0;
+
+            while (total < header.Length)
+            {
+                var read = await stream.ReadAsync(
+                    header.AsMemory(total, header.Length - total));
+
+                if (read == 0)
+                {
+                    break;
+                }
+
+                total += read;
+            }
+
+            if (total >= 3 &&
+                header[0] == 0xFF &&
+                header[1] == 0xD8 &&
+                header[2] == 0xFF)
+            {
+                return ".jpg";
+            }
+
+            if (total == 8 &&
+                header.SequenceEqual(new byte[]
+                {
+            0x89, 0x50, 0x4E, 0x47,
+            0x0D, 0x0A, 0x1A, 0x0A
+                }))
+            {
+                return ".png";
+            }
+
+            return null;
         }
     }
 }

@@ -152,6 +152,8 @@
             </div>
         </div>
 
+        <partial name="_PhoneSpecificationFields" model="Model" />
+
         <div class="d-flex gap-3 mt-4">
             <button type="submit"
                     class="btn btn-warning fw-semibold px-4">
@@ -167,4 +169,5 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/product-specifications.js" asp-append-version="true"></script>
 }

@@ -1,0 +1,71 @@
+﻿@model CCMobile.Models.Product
+@{
+    ViewData["Title"] = "Quản lý ảnh";
+    var images = Model.Images.OrderByDescending(i => i.IsPrimary)
+        .ThenBy(i => i.DisplayOrder).ThenBy(i => i.Id).ToList();
+}
+<div class="py-4">
+    <a asp-action="Index" class="text-dark">← Quản lý sản phẩm</a>
+    <h1 class="h3 mt-4">Quản lý ảnh</h1>
+    <p class="text-muted">@Model.Name · @Model.Sku</p>
+    @if (TempData["SuccessMessage"] is string message)
+    {
+        <div class="alert alert-success" role="status">@message</div>
+    }
+    <div class="d-flex gap-2 mb-4">
+        <a asp-action="UploadImage" asp-route-id="@Model.Id"
+           class="btn btn-warning fw-semibold">Thêm ảnh</a>
+        @if (Model.IsActive)
+        {
+            <a asp-controller="Products" asp-action="Details"
+               asp-route-id="@Model.Id" class="btn btn-outline-dark">Xem sản phẩm</a>
+        }
+    </div>
+    @if (images.Count == 0)
+    {
+        <div class="alert alert-light border">Sản phẩm chưa có ảnh. Chọn “Thêm ảnh” để bắt đầu.</div>
+    }
+    else
+    {
+        <p>@images.Count ảnh. Ảnh đại diện được dùng trong danh sách sản phẩm.</p>
+        <div class="row g-3">
+            @foreach (var image in images)
+            {
+                <div class="col-12 col-sm-6 col-lg-3">
+                    <article class="border rounded-3 p-3 h-100">
+                        <img src="@Url.Content(image.ImageUrl)"
+                             alt="@(image.AltText ?? Model.Name)"
+                             class="w-100" style="height: 180px; object-fit: contain;"
+                             loading="lazy" />
+                        <div class="mt-3 mb-3">
+                            @if (image.IsPrimary)
+                            {
+                                <span class="badge bg-warning text-dark">Ảnh đại diện</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted small">Ảnh bổ sung</span>
+                            }
+                        </div>
+                        <div class="d-flex flex-wrap gap-2">
+                            @if (!image.IsPrimary)
+                            {
+                                <form asp-action="SetPrimaryImage" asp-route-id="@Model.Id" method="post">
+                                    <input type="hidden" name="imageId" value="@image.Id" />
+                                    <button type="submit" class="btn btn-sm btn-outline-dark">
+                                        Đặt làm đại diện
+                                    </button>
+                                </form>
+                            }
+                            <form asp-action="DeleteImage" asp-route-id="@Model.Id" method="post"
+                                  onsubmit="return confirm('Gỡ ảnh này khỏi sản phẩm?');">
+                                <input type="hidden" name="imageId" value="@image.Id" />
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Gỡ ảnh</button>
+                            </form>
+                        </div>
+                    </article>
+                </div>
+            }
+        </div>
+    }
+</div>

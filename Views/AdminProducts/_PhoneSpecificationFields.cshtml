@@ -1,0 +1,105 @@
+﻿@model CCMobile.ViewModels.ProductFormViewModel
+
+<section class="border rounded-3 p-4 mt-4" aria-labelledby="phone-spec-title">
+    <h2 id="phone-spec-title" class="h5">Thông số điện thoại</h2>
+    <div class="form-check mb-2">
+        <input asp-for="HasPhoneSpecification" class="form-check-input"
+               aria-controls="phone-spec-fields" />
+        <label asp-for="HasPhoneSpecification" class="form-check-label fw-semibold"></label>
+    </div>
+    <p class="text-muted small">
+        Bật cho điện thoại; để tắt với phụ kiện không có cấu hình điện thoại.
+        Bốn mục có dấu * cần được nhập, các mục khác có thể để trống.
+    </p>
+    <p class="text-muted small">
+        Khi sửa: bỏ chọn rồi lưu sẽ xóa bộ thông số điện thoại đang có.
+        Không ảnh hưởng ảnh hoặc thông tin chung của sản phẩm.
+    </p>
+    <fieldset id="phone-spec-fields">
+        <legend class="visually-hidden">Chi tiết thông số điện thoại</legend>
+        <div class="row g-3">
+            <div class="col-12 col-md-6">
+                <label asp-for="PhoneChipset" class="form-label">Chip xử lý *</label>
+                <input asp-for="PhoneChipset" class="form-control"
+                       type="text" maxlength="200"
+                       aria-required="true" />
+                <span asp-validation-for="PhoneChipset" class="text-danger small"></span>
+            </div>
+            <div class="col-12 col-md-6">
+                <label asp-for="PhoneRamGb" class="form-label">RAM (GB) *</label>
+                <input asp-for="PhoneRamGb" class="form-control"
+                       type="number" min="1" max="128" step="1"
+                       aria-required="true" />
+                <span asp-validation-for="PhoneRamGb" class="text-danger small"></span>
+            </div>
+            <div class="col-12 col-md-6">
+                <label asp-for="PhoneStorageGb" class="form-label">Bộ nhớ (GB) *</label>
+                <input asp-for="PhoneStorageGb" class="form-control"
+                       type="number" min="1" max="8192" step="1"
+                       aria-required="true" />
+                <span asp-validation-for="PhoneStorageGb" class="text-danger small"></span>
+            </div>
+            <div class="col-12 col-md-6">
+                <label asp-for="PhoneScreenSizeInches" class="form-label">Màn hình (inch) *</label>
+                <input asp-for="PhoneScreenSizeInches" class="form-control"
+                       type="number" min="1" max="15" step="any"
+                       aria-required="true" />
+                <span asp-validation-for="PhoneScreenSizeInches" class="text-danger small"></span>
+            </div>
+            <div class="col-12 col-md-6">
+                <label asp-for="PhoneScreenResolution" class="form-label">Độ phân giải</label>
+                <input asp-for="PhoneScreenResolution" class="form-control"
+                       type="text" maxlength="100" />
+                <span asp-validation-for="PhoneScreenResolution" class="text-danger small"></span>
+            </div>
+            <div class="col-12 col-md-6">
+                <label asp-for="PhonePanelType" class="form-label">Tấm nền</label>
+                <input asp-for="PhonePanelType" class="form-control"
+                       type="text" maxlength="100" />
+                <span asp-validation-for="PhonePanelType" class="text-danger small"></span>
+            </div>
+            <div class="col-12 col-md-6">
+                <label asp-for="PhoneRefreshRateHz" class="form-label">Tần số quét (Hz)</label>
+                <input asp-for="PhoneRefreshRateHz" class="form-control"
+                       type="number" min="1" max="1000" step="1" />
+                <span asp-validation-for="PhoneRefreshRateHz" class="text-danger small"></span>
+            </div>
+            <div class="col-12 col-md-6">
+                <label asp-for="PhoneRearCamera" class="form-label">Camera sau</label>
+                <input asp-for="PhoneRearCamera" class="form-control"
+                       type="text" maxlength="300" />
+                <span asp-validation-for="PhoneRearCamera" class="text-danger small"></span>
+            </div>
+            <div class="col-12 col-md-6">
+                <label asp-for="PhoneFrontCamera" class="form-label">Camera trước</label>
+                <input asp-for="PhoneFrontCamera" class="form-control"
+                       type="text" maxlength="200" />
+                <span asp-validation-for="PhoneFrontCamera" class="text-danger small"></span>
+            </div>
+            <div class="col-12 col-md-6">
+                <label asp-for="PhoneBatteryMah" class="form-label">Dung lượng pin (mAh)</label>
+                <input asp-for="PhoneBatteryMah" class="form-control"
+                       type="number" min="1" max="50000" step="1" />
+                <span asp-validation-for="PhoneBatteryMah" class="text-danger small"></span>
+            </div>
+            <div class="col-12 col-md-6">
+                <label asp-for="PhoneChargingWatts" class="form-label">Công suất sạc (W)</label>
+                <input asp-for="PhoneChargingWatts" class="form-control"
+                       type="number" min="1" max="500" step="1" />
+                <span asp-validation-for="PhoneChargingWatts" class="text-danger small"></span>
+            </div>
+            <div class="col-12 col-md-6">
+                <label asp-for="PhoneOperatingSystem" class="form-label">Hệ điều hành</label>
+                <input asp-for="PhoneOperatingSystem" class="form-control"
+                       type="text" maxlength="100" />
+                <span asp-validation-for="PhoneOperatingSystem" class="text-danger small"></span>
+            </div>
+            <div class="col-12 col-md-6">
+                <label asp-for="PhoneWeightGrams" class="form-label">Khối lượng (g)</label>
+                <input asp-for="PhoneWeightGrams" class="form-control"
+                       type="number" min="1" max="2000" step="any" />
+                <span asp-validation-for="PhoneWeightGrams" class="text-danger small"></span>
+            </div>
+        </div>
+    </fieldset>
+</section>
