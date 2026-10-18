@@ -1,0 +1,31 @@
+﻿@model CCMobile.ViewModels.LookupFormViewModel
+@{
+    var isEdit = ViewData["IsEdit"] is true;
+    var action = isEdit ? "Edit" : "Create";
+}
+<div class="row justify-content-center py-4">
+    <div class="col-12 col-lg-7">
+        <a asp-action="Index" class="text-dark">← Quản lý thương hiệu</a>
+        <h1 class="h3 mt-4 mb-4">@ViewData["Title"]</h1>
+        <form asp-controller="AdminBrands" asp-action="@action"
+              asp-route-id="@ViewData["ItemId"]" method="post" novalidate
+              class="border rounded-3 p-4">
+            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+            <div class="mb-3">
+                <label asp-for="Name" class="form-label">Tên thương hiệu</label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger small"></span>
+            </div>
+            <div class="mb-4">
+                <label asp-for="Description" class="form-label"></label>
+                <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                <span asp-validation-for="Description" class="text-danger small"></span>
+            </div>
+            <button type="submit" class="btn btn-warning fw-semibold">Lưu</button>
+            <a asp-action="Index" class="btn btn-outline-dark ms-2">Hủy</a>
+        </form>
+    </div>
+</div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

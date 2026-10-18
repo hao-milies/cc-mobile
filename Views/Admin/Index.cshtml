@@ -1,25 +1,35 @@
 ﻿@{
     ViewData["Title"] = "Quản trị cửa hàng";
 }
-
 <div class="py-5">
     <p class="small fw-bold">CC MOBILE / QUẢN TRỊ</p>
-
     <h1 class="h3">Quản trị cửa hàng</h1>
+    <p class="text-muted mb-4">Quản lý sản phẩm và thông tin phân loại của cửa hàng.</p>
+    <div class="row g-3">
 
-    <p class="text-muted">
-        Bạn đã đăng nhập bằng tài khoản có quyền quản trị.
-    </p>
-
-    <div class="p-4 border rounded-3"
-         style="background: #f7f3e8;">
-        <h2 class="h5">Sản phẩm</h2>
-        <p>Xem và quản lý danh sách sản phẩm của cửa hàng.</p>
-
-        <a asp-controller="AdminProducts"
-           asp-action="Index"
-           class="btn btn-warning fw-semibold">
-            Quản lý sản phẩm
-        </a>
+        <div class="col-12 col-md-4">
+            <section class="border rounded-3 p-4 h-100" style="background: #f7f3e8;">
+                <h2 class="h5">Sản phẩm</h2>
+                <p>Thông tin, giá bán, tồn kho, thông số và hình ảnh.</p>
+                <a asp-controller="AdminProducts" asp-action="Index"
+                   class="btn btn-warning fw-semibold">Quản lý sản phẩm</a>
+            </section>
+        </div>
+        <div class="col-12 col-md-4">
+            <section class="border rounded-3 p-4 h-100" style="background: #f7f3e8;">
+                <h2 class="h5">Danh mục</h2>
+                <p>Phân loại điện thoại, tai nghe, sạc và phụ kiện.</p>
+                <a asp-controller="AdminCategories" asp-action="Index"
+                   class="btn btn-warning fw-semibold">Quản lý danh mục</a>
+            </section>
+        </div>
+        <div class="col-12 col-md-4">
+            <section class="border rounded-3 p-4 h-100" style="background: #f7f3e8;">
+                <h2 class="h5">Thương hiệu</h2>
+                <p>Quản lý các hãng để sử dụng khi thêm sản phẩm.</p>
+                <a asp-controller="AdminBrands" asp-action="Index"
+                   class="btn btn-warning fw-semibold">Quản lý thương hiệu</a>
+            </section>
+        </div>
     </div>
 </div>
