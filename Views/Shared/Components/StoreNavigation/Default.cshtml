@@ -2,6 +2,8 @@
 @{
     var current = ViewContext.RouteData.Values["controller"]?.ToString();
     var admin = User.IsInRole("Admin");
+    var onSalePage = current == "Products"
+        && string.Equals(Context.Request.Query["saleOnly"].ToString(), "true", StringComparison.OrdinalIgnoreCase);
 }
 <nav class="cc-nav" aria-label="Điều hướng chính">
 <div class="cc-shell cc-nav-inner">
@@ -16,28 +18,8 @@
 }
 else
 {
-    <a asp-controller="Products" asp-action="Index" aria-current="@(current == "Products" ? "page" : null)"><svg class="cc-icon " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M10 18h4"/></svg> Tất cả sản phẩm</a>
-    <a asp-controller="Products" asp-action="Index" asp-route-saleOnly="true" class="cc-promo-nav"><svg class="cc-icon " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 3h7l11 11-7 7L3 10z"/><circle cx="7" cy="7" r="1"/></svg> Khuyến mại</a>
-    <details class="cc-menu" id="cc-discover">
-        <summary><svg class="cc-icon " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span class="cc-menu-label">Chọn theo nhu cầu</span><svg class="cc-icon cc-menu-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m6 9 6 6 6-6"/></svg></summary>
-        <div class="cc-mega">
-            <section><h2>Theo thương hiệu</h2>
-                @foreach (var brand in Model.Brands)
-                { <a asp-controller="Products" asp-action="Index" asp-route-brandId="@brand.Id">@brand.Name <span aria-hidden="true">↗</span></a> }
-                @if (!Model.Brands.Any()) { <p>Đang cập nhật thương hiệu.</p> }
-            </section>
-            <section><h2>Theo danh mục</h2>
-                @foreach (var category in Model.Categories)
-                { <a asp-controller="Products" asp-action="Index" asp-route-categoryId="@category.Id">@category.Name <span aria-hidden="true">↗</span></a> }
-            </section>
-            <section><h2>Theo ngân sách</h2>
-                <a asp-controller="Products" asp-action="Index" asp-route-budget="under5">Dưới 5 triệu</a>
-                <a asp-controller="Products" asp-action="Index" asp-route-budget="5to10">Từ 5 đến dưới 10 triệu</a>
-                <a asp-controller="Products" asp-action="Index" asp-route-budget="10plus">Từ 10 triệu trở lên</a>
-                <p class="cc-menu-note">Chọn một nhóm để khám phá sản phẩm phù hợp với bạn.</p>
-            </section>
-        </div>
-    </details>
+    <a asp-controller="Products" asp-action="Index" aria-current="@(current == "Products" && !onSalePage ? "page" : null)"><svg class="cc-icon " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M10 18h4"/></svg> Tất cả sản phẩm</a>
+    <a asp-controller="Products" asp-action="Index" asp-route-saleOnly="true" class="cc-promo-nav" aria-current="@(onSalePage ? "page" : null)"><svg class="cc-icon " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 3h7l11 11-7 7L3 10z"/><circle cx="7" cy="7" r="1"/></svg> Khuyến mại</a>
     @if (User.Identity?.IsAuthenticated == true)
     { <a asp-controller="Orders" asp-action="Index" aria-current="@(current == "Orders" ? "page" : null)"><svg class="cc-icon " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 3h6v4H9zM9 12h6M9 16h6"/></svg> Đơn hàng của tôi</a> }
     <a asp-controller="Cart" asp-action="Index" class="cc-nav-last" aria-current="@(current == "Cart" ? "page" : null)"><svg class="cc-icon " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M2 3h3l3 12h11l3-9H6"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg> Giỏ hàng</a>

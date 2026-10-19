@@ -4,7 +4,8 @@
     ViewData["Title"] = "Điện thoại và phụ kiện";
     var culture = CultureInfo.GetCultureInfo("vi-VN");
     var saleOnly = ViewData["SaleOnly"] is true;
-    var discountCount = ViewData["DiscountCount"] is int count ? count : 0;
+    var hasFilters = new[] { "search", "brandId", "categoryId", "budget", "sort" }
+        .Any(key => !string.IsNullOrWhiteSpace(Context.Request.Query[key].ToString()));
 }
 @if (TempData["SuccessMessage"] is string success) { <div class="alert alert-success">@success</div> }
 <section class="cc-deal-hero">
@@ -12,7 +13,6 @@
         <p class="cc-kicker">CC MOBILE / ĐIỆN THOẠI & PHỤ KIỆN</p>
         <h1>Chọn máy đúng gu.<br /><span>Giá hợp túi tiền.</span></h1>
         <p>Điện thoại, phụ kiện và những lựa chọn dành cho bạn.</p>
-        <a href="#catalogue" class="cc-deal-button">Khám phá ngay <span aria-hidden="true">↘</span></a>
     </div>
     <div class="cc-deal-art" aria-hidden="true">
         <span class="cc-deal-orbit">CC / MOBILE</span>
@@ -20,22 +20,11 @@
         <span class="cc-deal-star">✦</span>
     </div>
 </section>
-<div class="cc-shopping-tabs" aria-label="Chọn nhóm sản phẩm">
-    <a asp-action="Index" class="@(!saleOnly ? "selected" : "")">Tất cả sản phẩm</a>
-    <a asp-action="Index" asp-route-saleOnly="true" class="@(saleOnly ? "selected" : "")">✦ Đang giảm giá <span>@discountCount</span></a>
-    <a asp-action="Index" asp-route-budget="under5">Dưới 5 triệu</a>
-    <a asp-action="Index" asp-route-budget="5to10">5–10 triệu</a>
-    <a asp-action="Index" asp-route-budget="10plus">Từ 10 triệu</a>
-</div>
 <section id="catalogue" class="cc-catalogue-section">
     <div class="cc-catalogue-title">
-        <h2>@(saleOnly ? "Giá mới. Lựa chọn mới." : "Điện thoại & phụ kiện")</h2>
+        <h2>@(saleOnly ? "Sản phẩm khuyến mại" : "Điện thoại & phụ kiện")</h2>
         <span>@Model.Count() sản phẩm</span>
     </div>
-    @if (discountCount > 0 && !saleOnly)
-    {
-        <div class="cc-deal-strip"><strong>✦ CÓ GIÁ MỚI!</strong><span>@discountCount sản phẩm đang có giá khuyến mại.</span><a asp-action="Index" asp-route-saleOnly="true">Xem ưu đãi →</a></div>
-    }
     <form asp-controller="Products" asp-action="Index" method="get" class="cc-filters">
         <input type="hidden" name="search" value="@ViewData["Search"]" />
         <div class="row g-2 align-items-end">
@@ -45,15 +34,22 @@
             <div class="col-6 col-lg-2"><label for="sort-filter" class="form-label">Sắp xếp</label><select id="sort-filter" name="sort" asp-items="ViewBag.SortOptions" class="form-select"></select></div>
             <div class="col-12 col-lg-2"><button class="btn btn-warning w-100" type="submit">Áp dụng</button></div>
         </div>
-        <div class="d-flex justify-content-between flex-wrap gap-2 mt-3 small">
-            <label class="d-flex align-items-center gap-2"><input type="checkbox" name="saleOnly" value="true" checked="@saleOnly" class="form-check-input mt-0" /> Chỉ hiện sản phẩm giảm giá</label>
-            @if (ViewData["Search"] is string term && !string.IsNullOrWhiteSpace(term)) { <span>Kết quả cho “@term”</span> }
-            <a asp-action="Index">Xóa bộ lọc</a>
-        </div>
+        @if (saleOnly)
+        {
+            <input type="hidden" name="saleOnly" value="true" />
+        }
+        @if (hasFilters)
+        {
+            <div class="d-flex justify-content-between flex-wrap gap-2 mt-3 small">
+                @if (ViewData["Search"] is string term && !string.IsNullOrWhiteSpace(term))
+                { <span>Kết quả cho “@term”</span> }
+                <a asp-action="Index" asp-route-saleOnly="@(saleOnly ? "true" : null)" class="ms-auto">Xóa bộ lọc</a>
+            </div>
+        }
     </form>
     @if (!Model.Any())
     {
-        <div class="alert alert-light border p-4"><h3 class="h5">Chưa tìm thấy sản phẩm phù hợp</h3><p>Thử đổi bộ lọc hoặc tìm một tên sản phẩm khác.</p><a asp-action="Index">Xem tất cả sản phẩm</a></div>
+        <div class="alert alert-light border p-4"><h3 class="h5">Chưa tìm thấy sản phẩm phù hợp</h3><p>Thử đổi bộ lọc hoặc tìm một tên sản phẩm khác.</p></div>
     }
     else
     {

@@ -1,0 +1,16 @@
+﻿
+.cc-editor-field .ql-toolbar{background:#f7f3e8;border-radius:6px 6px 0 0;border-color:#cbc7bd}
+.cc-editor-field .ql-container{border-radius:0 0 6px 6px;border-color:#cbc7bd;background:white;font-family:inherit;font-size:16px}
+.cc-editor-field .ql-editor{min-height:230px;max-height:550px;overflow-y:auto;line-height:1.65}
+.cc-editor-field .ql-editor:focus-visible{outline:2px solid #8b7429;outline-offset:-2px}
+.cc-editor-field .ql-toolbar button:focus-visible{outline:2px solid #302b37}
+.cc-editor-field [hidden]{display:none!important}
+.cc-editor-field .ql-toolbar .ql-formats{margin-right:12px}
+.cc-rich-description{white-space:normal!important;overflow-wrap:anywhere;line-height:1.7}
+.cc-rich-description p{margin:0 0 12px}
+.cc-rich-description h2{font-size:1.4rem;line-height:1.35;margin:24px 0 12px}
+.cc-rich-description h3{font-size:1.15rem;line-height:1.4;margin:18px 0 10px}
+.cc-rich-description ul,.cc-rich-description ol{padding-left:24px;margin-bottom:16px}
+.cc-rich-description li{margin:4px 0}
+.cc-rich-description a{text-decoration:underline;color:#254b9a}
+.cc-description-plain{white-space:pre-wrap}

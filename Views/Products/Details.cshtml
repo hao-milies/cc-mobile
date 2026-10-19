@@ -1,4 +1,5 @@
-﻿@model CCMobile.Models.Product
+﻿<link rel="stylesheet" href="~/css/cc-editor.css" asp-append-version="true" />
+@model CCMobile.Models.Product
 @using System.Globalization
 
 @{
@@ -154,7 +155,7 @@
     {
         <section class="cc-section">
             <h2 class="cc-section-title">Về sản phẩm</h2>
-            <div class="cc-description">@Model.Description</div>
+            <div class="cc-description cc-rich-description">@CCMobile.Infrastructure.ProductDescription.Render(Model.Description)</div>
         </section>
     }
 

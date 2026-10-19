@@ -1,0 +1,15 @@
+﻿
+.cc-search{position:relative;overflow:visible}
+.cc-search input{border-radius:6px 0 0 6px}
+.cc-search button{border-radius:0 6px 6px 0}
+.cc-search-results{position:absolute;top:calc(100% + 8px);left:0;right:0;z-index:100;background:#fff;border:1px solid #c7c1b4;border-radius:8px;box-shadow:0 12px 28px #302b3726;max-height:65vh;overflow:auto}
+.cc-search-results[hidden]{display:none}
+.cc-search-status{padding:12px 14px;margin:0;font-size:13px;color:#68636b;border-bottom:1px solid #eee}
+.cc-search-results ul{list-style:none;padding:0;margin:0}
+.cc-search-result{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 14px;text-decoration:none;border-bottom:1px solid #eee}
+.cc-search-result:hover,.cc-search-result:focus-visible{background:#fff6ce;color:#302b37}
+.cc-search-result strong{display:block;font-size:15px;font-weight:600;line-height:1.35}
+.cc-search-result small{display:block;font-size:12px;color:#736d74;margin-top:3px}
+.cc-search-price{white-space:nowrap;font-size:14px;font-weight:600;color:#302b37}
+.cc-search-all{display:block;padding:12px 14px;font-size:14px;font-weight:600;background:#f6f3e9;text-decoration:none}
+@media(max-width:450px){.cc-search-result{align-items:flex-start;flex-direction:column;gap:4px}}

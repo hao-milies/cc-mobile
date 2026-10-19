@@ -1,4 +1,4 @@
-﻿@{ var isAdmin = User.IsInRole("Admin"); }
+@{ var isAdmin = User.IsInRole("Admin"); }
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="~/CCMobile.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/cc-store.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/cc-details.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/cc-search.css" asp-append-version="true" />
 </head>
 <body class="@(isAdmin ? "cc-admin" : "cc-store")">
 <a class="cc-skip" href="#main-content">Bỏ qua menu, đến nội dung</a>
@@ -44,7 +45,7 @@
         {
             <form asp-controller="Products" asp-action="Index" method="get" role="search" class="cc-search">
                 <label for="cc-site-search" class="visually-hidden">Tìm sản phẩm</label>
-                <input id="cc-site-search" name="search" type="search" maxlength="100" value="@Context.Request.Query["search"]" placeholder="Bạn đang tìm điện thoại hay phụ kiện?" />
+                <input id="cc-site-search" autocomplete="off" aria-controls="cc-search-results" aria-expanded="false" data-api-url="@Url.Content("~/api/products")" data-details-url="@Url.Content("~/Products/Details")" name="search" type="search" maxlength="100" value="@Context.Request.Query["search"]" placeholder="Bạn đang tìm điện thoại hay phụ kiện?" />
                 <button type="submit"><svg class="cc-icon " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg> Tìm kiếm</button>
             </form>
         }
@@ -94,6 +95,8 @@
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 <script src="~/js/site.js" asp-append-version="true"></script>
 <script src="~/js/cc-navigation.js" asp-append-version="true"></script>
+<script src="~/js/cc-search.js" asp-append-version="true"></script>
 @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
+

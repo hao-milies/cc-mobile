@@ -53,13 +53,7 @@
                     </div>
 
                     <div>
-                        <label asp-for="Description"
-                               class="form-label"></label>
-                        <textarea asp-for="Description"
-                                  class="form-control"
-                                  rows="7"></textarea>
-                        <span asp-validation-for="Description"
-                              class="text-danger small"></span>
+                        <partial name="_DescriptionEditor" model="Model" />
                     </div>
                 </div>
             </div>
@@ -169,6 +163,8 @@
 </div>
 
 @section Scripts {
+    <script src="~/lib/quill/quill.js"></script>
+    <script src="~/js/cc-editor.js" asp-append-version="true"></script>
     <partial name="_ValidationScriptsPartial" />
     <script src="~/js/product-specifications.js" asp-append-version="true"></script>
 }

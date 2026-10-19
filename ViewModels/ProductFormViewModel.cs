@@ -28,6 +28,10 @@ namespace CCMobile.ViewModels
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
+            if (!CCMobile.Infrastructure.ProductDescription.IsValid(Description))
+                yield return new ValidationResult(
+                    CCMobile.Infrastructure.ProductDescription.ValidationMessage, new[] { nameof(Description) });
+
             if (SalePrice.HasValue && Price.HasValue && SalePrice.Value >= Price.Value)
                 yield return new ValidationResult("Giá khuyến mại phải nhỏ hơn giá gốc.", new[] { nameof(SalePrice) });
         }

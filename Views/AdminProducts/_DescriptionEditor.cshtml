@@ -1,0 +1,30 @@
+﻿@model CCMobile.ViewModels.ProductFormViewModel
+<link rel="stylesheet" href="~/lib/quill/quill.snow.css" />
+<link rel="stylesheet" href="~/css/cc-editor.css" asp-append-version="true" />
+<div class="cc-editor-field">
+    <label for="Description" id="cc-description-label" class="form-label">Mô tả chi tiết</label>
+    <textarea asp-for="Description" class="form-control" rows="7" aria-describedby="cc-description-help"></textarea>
+    <div id="cc-description-enhanced" hidden>
+        <div id="cc-description-toolbar" aria-label="Định dạng mô tả">
+            <span class="ql-formats">
+                <button type="button" class="ql-bold" aria-label="In đậm" title="In đậm"></button>
+                <button type="button" class="ql-italic" aria-label="In nghiêng" title="In nghiêng"></button>
+            </span>
+            <span class="ql-formats">
+                <button type="button" class="ql-header" value="2" aria-label="Tiêu đề" title="Tiêu đề">H2</button>
+                <button type="button" class="ql-header" value="3" aria-label="Tiêu đề nhỏ" title="Tiêu đề nhỏ">H3</button>
+            </span>
+            <span class="ql-formats">
+                <button type="button" class="ql-list" value="bullet" aria-label="Danh sách gạch đầu dòng" title="Danh sách gạch đầu dòng"></button>
+                <button type="button" class="ql-list" value="ordered" aria-label="Danh sách đánh số" title="Danh sách đánh số"></button>
+                <button type="button" class="ql-link" aria-label="Chèn liên kết" title="Chèn liên kết"></button>
+                <button type="button" class="ql-clean" aria-label="Xóa định dạng" title="Xóa định dạng"></button>
+            </span>
+        </div>
+        <div id="cc-description-editor"></div>
+    </div>
+    <p id="cc-description-help" class="form-text mb-1">Tối đa 20.000 ký tự. Dùng tiêu đề và danh sách để trình bày tính năng. Ảnh sản phẩm được quản lý ở mục Hình ảnh.</p>
+    <p id="cc-description-count" class="form-text" aria-live="polite"></p>
+    <span asp-validation-for="Description" class="text-danger small"></span>
+    <p id="cc-description-error" class="text-danger small" role="alert" hidden></p>
+</div>
