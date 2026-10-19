@@ -62,8 +62,6 @@
         {
             var cover = product.Images.OrderByDescending(x => x.IsPrimary).ThenBy(x => x.DisplayOrder).FirstOrDefault();
             <article class="cc-product-card @(product.HasDiscount ? "cc-on-sale" : "")">
-                @if (product.HasDiscount)
-                { <span class="cc-card-discount">@(product.DiscountPercent > 0 ? "-" + product.DiscountPercent.ToString("0.#", culture) + "%" : "Ưu đãi")</span> }
                 <a asp-action="Details" asp-route-id="@product.Id" class="cc-card-image" aria-label="Xem @product.Name">
                     @if (cover != null) { <img src="@Url.Content(cover.ImageUrl)" alt="@(cover.AltText ?? product.Name)" loading="lazy" width="300" height="200" /> }
                     else { <span>Ảnh đang cập nhật</span> }
@@ -73,7 +71,13 @@
                     <h3><a asp-action="Details" asp-route-id="@product.Id">@product.Name</a></h3>
                     <p class="cc-card-summary">@product.ShortDescription</p>
                     <div class="cc-card-bottom"><div>
-                        <p class="cc-card-price">@product.EffectivePrice.ToString("N0", culture) ₫</p>
+                        <div class="cc-price-line">
+                            <p class="cc-card-price">@product.EffectivePrice.ToString("N0", culture) <span class="cc-currency">₫</span></p>
+                            @if (product.HasDiscount)
+                            {
+                                <span class="cc-price-stamp">@(product.DiscountPercent > 0 ? "−" + product.DiscountPercent.ToString("0.#", culture) + "%" : "Ưu đãi")</span>
+                            }
+                        </div>
                         @if (product.HasDiscount)
                         { <p class="cc-card-was"><del>@product.Price.ToString("N0", culture) ₫</del><span>Giá gốc</span></p> }
                         <span class="cc-card-stock">@(product.StockQuantity > 0 ? "● Còn hàng" : "Tạm hết hàng")</span>

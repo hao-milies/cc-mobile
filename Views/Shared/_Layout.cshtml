@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/CCMobile.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/cc-store.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/cc-details.css" asp-append-version="true" />
 </head>
 <body class="@(isAdmin ? "cc-admin" : "cc-store")">
 <a class="cc-skip" href="#main-content">Bỏ qua menu, đến nội dung</a>
@@ -22,17 +23,17 @@
                 {
                     <span class="cc-user-name">@(isAdmin ? "Quản trị viên" : "Xin chào"), @User.Identity.Name</span>
                     <form asp-controller="Account" asp-action="Logout" method="post">
-                        <button type="submit">Đăng xuất</button>
+                        <button type="submit"><svg class="cc-icon " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 4H4v16h5m4-13 5 5-5 5m-5-5h12"/></svg> Đăng xuất</button>
                     </form>
                 }
                 else
                 {
-                    <a asp-controller="Account" asp-action="Login">Đăng nhập</a>
+                    <a asp-controller="Account" asp-action="Login"><svg class="cc-icon " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="3"/><path d="M5 21v-2a7 7 0 0 1 14 0v2"/></svg> Đăng nhập</a>
                     <span aria-hidden="true">/</span>
                     <a asp-controller="Account" asp-action="Register">Đăng ký</a>
                 }
             </div>
-            <span class="cc-utility-tag">@(isAdmin ? "KHÔNG GIAN QUẢN TRỊ" : "ĐIỆN THOẠI & PHỤ KIỆN")</span>
+            <span class="cc-utility-tag">@(isAdmin ? "CC MOBILE / QUẢN LÝ" : "ĐIỆN THOẠI & PHỤ KIỆN")</span>
         </div>
     </div>
     <div class="cc-shell cc-masthead">
@@ -44,12 +45,12 @@
             <form asp-controller="Products" asp-action="Index" method="get" role="search" class="cc-search">
                 <label for="cc-site-search" class="visually-hidden">Tìm sản phẩm</label>
                 <input id="cc-site-search" name="search" type="search" maxlength="100" value="@Context.Request.Query["search"]" placeholder="Bạn đang tìm điện thoại hay phụ kiện?" />
-                <button type="submit">Tìm kiếm <span aria-hidden="true">↗</span></button>
+                <button type="submit"><svg class="cc-icon " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg> Tìm kiếm</button>
             </form>
         }
         else
         {
-            <div class="cc-admin-caption"><strong>Quản trị cửa hàng</strong><span>Sản phẩm, đơn hàng và danh mục — trong một nơi.</span></div>
+            <div class="cc-admin-caption"><strong>Quản lý bán hàng</strong><span>Theo dõi đơn hàng, cập nhật sản phẩm và tồn kho.</span></div>
         }
     </div>
     @await Component.InvokeAsync("StoreNavigation")
@@ -58,11 +59,36 @@
     @RenderBody()
 </main>
 <footer class="cc-footer">
-    <div class="cc-shell cc-footer-inner">
-        <div><strong>CC MOBILE<span aria-hidden="true"> )))</span></strong><p>Điện thoại và phụ kiện.</p></div>
-        <span>© @DateTime.Now.Year CC Mobile</span>
-        <a asp-controller="Home" asp-action="Privacy">Chính sách riêng tư</a>
+    <div class="cc-shell cc-footer-grid">
+        <section>
+            <strong class="cc-footer-brand">CC MOBILE<span aria-hidden="true"> )))</span></strong>
+            <p>Điện thoại và phụ kiện.</p>
+            <p class="cc-footer-description">Xem thông số, lựa chọn theo nhu cầu và theo dõi đơn hàng ngay trên website.</p>
+        </section>
+        @if (isAdmin)
+        {
+            <section><h2>Quản lý bán hàng</h2>
+                <a asp-controller="AdminProducts" asp-action="Index">Sản phẩm và tồn kho</a>
+                <a asp-controller="AdminOrders" asp-action="Index">Đơn hàng và yêu cầu hủy</a>
+                <a asp-controller="AdminBrands" asp-action="Index">Thương hiệu</a>
+            </section>
+            <section><h2>Lưu ý khi cập nhật</h2><p>Kiểm tra giá, số lượng và trạng thái hiển thị trước khi lưu thay đổi.</p><p>Giá trên đơn đã đặt được giữ theo thời điểm mua.</p></section>
+        }
+        else
+        {
+            <section><h2>Khám phá sản phẩm</h2>
+                <a asp-controller="Products" asp-action="Index">Điện thoại và phụ kiện</a>
+                <a asp-controller="Products" asp-action="Index" asp-route-saleOnly="true">Sản phẩm đang giảm giá</a>
+                <a asp-controller="Orders" asp-action="Index">Theo dõi đơn hàng</a>
+            </section>
+            <section><h2>Thông tin mua hàng</h2>
+                <details class="cc-footer-help"><summary>Thanh toán như thế nào?</summary><p>Website hiện hỗ trợ thanh toán khi nhận hàng (COD). Kiểm tra thông tin người nhận và tổng tiền trước khi đặt.</p></details>
+                <details class="cc-footer-help"><summary>Xem trạng thái đơn ở đâu?</summary><p>Đăng nhập và mở “Đơn hàng của tôi” để xem chi tiết, số tiền và trạng thái xử lý.</p></details>
+                <details class="cc-footer-help"><summary>Cần hủy đơn hàng?</summary><p>Mở chi tiết đơn hàng và gửi yêu cầu hủy nếu đơn đủ điều kiện. Yêu cầu sẽ được quản trị viên xem xét.</p></details>
+            </section>
+        }
     </div>
+    <div class="cc-shell cc-footer-bottom"><span>© @DateTime.Now.Year CC Mobile</span><a asp-controller="Home" asp-action="Privacy">Thông tin quyền riêng tư</a></div>
 </footer>
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

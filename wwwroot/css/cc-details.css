@@ -1,0 +1,32 @@
+﻿
+/* Small interface details, loaded after the existing store theme. */
+.cc-icon{width:17px;height:17px;flex:0 0 17px;vertical-align:-3px;display:inline-block}
+.cc-nav-inner>a,.cc-menu>summary{display:flex;align-items:center;gap:8px}
+.cc-menu>summary{list-style:none}
+.cc-menu>summary::-webkit-details-marker{display:none}
+.cc-menu>summary::marker{content:""}
+.cc-menu>summary span{margin-left:0}
+.cc-menu-chevron{width:14px;height:14px;flex-basis:14px;margin-left:4px;transition:transform .18s}
+.cc-menu[open] .cc-menu-chevron{transform:rotate(180deg)}
+.cc-search button{display:flex;align-items:center;justify-content:center;gap:8px}
+.cc-admin-caption strong{font-size:1.25rem}
+.cc-admin-caption span{font-size:.9rem;line-height:1.5;margin-top:5px}
+.cc-footer-grid{display:grid;grid-template-columns:1.1fr 1fr 1.35fr;gap:48px;padding-block:12px 26px}
+.cc-footer-grid h2{font-size:15px;font-weight:650;margin:0 0 12px}
+.cc-footer-brand{font-size:20px;letter-spacing:.03em}
+.cc-footer-brand span{color:#88752a}
+.cc-footer-grid p{font-size:14px;line-height:1.6;color:#625e62;margin:8px 0}
+.cc-footer-description{max-width:320px}
+.cc-footer-grid section>a{display:block;width:fit-content;font-size:14px;line-height:1.5;text-decoration:none;margin-bottom:8px}
+.cc-footer-grid section>a:hover{text-decoration:underline}
+.cc-footer-help{border-bottom:1px solid #d8d3c9;padding:8px 0}
+.cc-footer-help summary{font-size:14px;font-weight:500;cursor:pointer}
+.cc-footer-help p{padding-left:16px}
+.cc-footer-bottom{border-top:1px solid #d8d3c9;padding-top:18px;display:flex;justify-content:space-between;gap:16px;font-size:13px;color:#625e62}
+.cc-privacy{max-width:820px;padding-block:20px}
+.cc-privacy h1{font-size:30px;margin-bottom:18px}
+.cc-privacy h2{font-size:20px;margin-top:28px}
+.cc-privacy p{line-height:1.7}
+@media(max-width:900px){.cc-footer-grid{gap:24px;grid-template-columns:1fr 1fr}.cc-footer-grid>section:first-child{grid-column:1/-1}.cc-nav-inner>a,.cc-menu>summary{gap:6px}}
+@media(max-width:600px){.cc-footer-grid{grid-template-columns:1fr;gap:24px}.cc-footer-bottom{flex-direction:column}.cc-nav-inner .cc-icon{width:15px;height:15px;flex-basis:15px}.cc-menu>summary{white-space:nowrap}}
+@media(prefers-reduced-motion:reduce){.cc-menu-chevron{transition:none}}
