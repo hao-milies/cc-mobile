@@ -1,105 +1,73 @@
-﻿<!DOCTYPE html>
+﻿@{ var isAdmin = User.IsInRole("Admin"); }
+<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - CCMobile</title>
+    <title>@ViewData["Title"] - CC Mobile</title>
     <script type="importmap"></script>
+    <link rel="icon" type="image/svg+xml" href="~/images/cc-mobile-logo.svg" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/CCMobile.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/cc-store.css" asp-append-version="true" />
 </head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">CCMobile</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                        @if (User.Identity?.IsAuthenticated == true)
-                        {
-                            <li class="nav-item">
-                                <span class="nav-link text-dark">
-                                    Xin chào, @User.Identity.Name
-                                </span>
-                            </li>
-
-                            <li class="nav-item">
-                                <form asp-controller="Account"
-                                      asp-action="Logout"
-                                      method="post">
-                                    <button type="submit"
-                                            class="btn nav-link text-dark">
-                                        Đăng xuất
-                                    </button>
-                                </form>
-                            </li>
-                        }
-                        else
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark"
-                                   asp-controller="Account"
-                                   asp-action="Login">
-                                    Đăng nhập
-                                </a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link text-dark"
-                                   asp-controller="Account"
-                                   asp-action="Register">
-                                    Đăng ký
-                                </a>
-                            </li>
-
-                        }
-
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Products" asp-action="Index">Sản phẩm</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Cart" asp-action="Index">Giỏ hàng</a>
-                        </li>
-                            @if (User.IsInRole("Admin"))
-                            {
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark"
-                                       asp-controller="Admin"
-                                       asp-action="Index">
-                                        Quản trị
-                                    </a>
-                                </li>
-                            }
-                    </ul>
-                </div>
+<body class="@(isAdmin ? "cc-admin" : "cc-store")">
+<a class="cc-skip" href="#main-content">Bỏ qua menu, đến nội dung</a>
+<header class="cc-header">
+    <div class="cc-utility">
+        <div class="cc-shell cc-utility-inner">
+            <div class="cc-account">
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <span class="cc-user-name">@(isAdmin ? "Quản trị viên" : "Xin chào"), @User.Identity.Name</span>
+                    <form asp-controller="Account" asp-action="Logout" method="post">
+                        <button type="submit">Đăng xuất</button>
+                    </form>
+                }
+                else
+                {
+                    <a asp-controller="Account" asp-action="Login">Đăng nhập</a>
+                    <span aria-hidden="true">/</span>
+                    <a asp-controller="Account" asp-action="Register">Đăng ký</a>
+                }
             </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
-
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - CCMobile - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            <span class="cc-utility-tag">@(isAdmin ? "KHÔNG GIAN QUẢN TRỊ" : "ĐIỆN THOẠI & PHỤ KIỆN")</span>
         </div>
-    </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+    </div>
+    <div class="cc-shell cc-masthead">
+        <a asp-controller="@(isAdmin ? "Admin" : "Products")" asp-action="Index" class="cc-logo" aria-label="CC Mobile — về trang chính">
+            <img src="~/images/cc-mobile-logo.svg" alt="CC Mobile" width="440" height="106" />
+        </a>
+        @if (!isAdmin)
+        {
+            <form asp-controller="Products" asp-action="Index" method="get" role="search" class="cc-search">
+                <label for="cc-site-search" class="visually-hidden">Tìm sản phẩm</label>
+                <input id="cc-site-search" name="search" type="search" maxlength="100" value="@Context.Request.Query["search"]" placeholder="Bạn đang tìm điện thoại hay phụ kiện?" />
+                <button type="submit">Tìm kiếm <span aria-hidden="true">↗</span></button>
+            </form>
+        }
+        else
+        {
+            <div class="cc-admin-caption"><strong>Quản trị cửa hàng</strong><span>Sản phẩm, đơn hàng và danh mục — trong một nơi.</span></div>
+        }
+    </div>
+    @await Component.InvokeAsync("StoreNavigation")
+</header>
+<main id="main-content" class="cc-shell cc-main" tabindex="-1">
+    @RenderBody()
+</main>
+<footer class="cc-footer">
+    <div class="cc-shell cc-footer-inner">
+        <div><strong>CC MOBILE<span aria-hidden="true"> )))</span></strong><p>Điện thoại và phụ kiện.</p></div>
+        <span>© @DateTime.Now.Year CC Mobile</span>
+        <a asp-controller="Home" asp-action="Privacy">Chính sách riêng tư</a>
+    </div>
+</footer>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/site.js" asp-append-version="true"></script>
+<script src="~/js/cc-navigation.js" asp-append-version="true"></script>
+@await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

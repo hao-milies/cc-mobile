@@ -1,0 +1,29 @@
+﻿@model IEnumerable<CCMobile.Models.Order>
+@using System.Globalization
+@using CCMobile.Services
+@{ ViewData["Title"] = "Đơn hàng của tôi"; var culture = CultureInfo.GetCultureInfo("vi-VN"); }
+<div class="py-4">
+    <h1 class="h3">Đơn hàng của tôi</h1>
+    @if (!Model.Any()) { <p class="my-4">Bạn chưa có đơn hàng nào.</p> }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead><tr><th>Mã đơn</th><th>Thời gian (Việt Nam)</th><th>Tổng tiền</th><th>Trạng thái</th><th></th></tr></thead>
+                <tbody>
+                @foreach (var order in Model)
+                {
+                    <tr>
+                        <td>#@order.Id</td>
+                        <td>@order.CreatedAt.AddHours(7).ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>@order.Total.ToString("N0", culture) ₫</td>
+                        <td>@OrderWorkflow.Label(order.Status)</td>
+                        <td><a asp-action="Details" asp-route-id="@order.Id">Xem đơn</a></td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+    <a asp-controller="Products" asp-action="Index" class="btn btn-outline-dark">Tiếp tục mua sắm</a>
+</div>

@@ -10,6 +10,10 @@
         {
         }
 
+        public DbSet<OrderCancellationRequest> OrderCancellationRequests => Set<OrderCancellationRequest>();
+        public DbSet<Order> Orders => Set<Order>();
+        public DbSet<OrderItem> OrderItems => Set<OrderItem>();
+
         public DbSet<Category> Categories => Set<Category>();
         public DbSet<Brand> Brands => Set<Brand>();
         public DbSet<Product> Products => Set<Product>();
@@ -20,6 +24,23 @@
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<Product>().ToTable(t => t.HasCheckConstraint(
+                "CK_Products_SalePrice", "[SalePrice] IS NULL OR ([SalePrice] > 0 AND [SalePrice] < [Price])"));
+
+            modelBuilder.Entity<OrderCancellationRequest>().HasOne(x => x.Order)
+                .WithMany(x => x.CancellationRequests).HasForeignKey(x => x.OrderId)
+                .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<OrderCancellationRequest>().HasIndex(x => x.OrderId)
+                .IsUnique().HasFilter("[Decision] = 'Pending'");
+
+            modelBuilder.Entity<Order>().HasIndex(x => x.CheckoutKey).IsUnique();
+            modelBuilder.Entity<Order>().HasOne(x => x.User).WithMany()
+                .HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<OrderItem>().HasOne(x => x.Order).WithMany(x => x.Items)
+                .HasForeignKey(x => x.OrderId).OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<OrderItem>().HasOne(x => x.Product).WithMany()
+                .HasForeignKey(x => x.ProductId).OnDelete(DeleteBehavior.Restrict);
+
 
             // Mã sản phẩm không được trùng.
             modelBuilder.Entity<Product>()

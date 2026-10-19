@@ -32,6 +32,33 @@ namespace CCMobile.Controllers
 
             return View(products);
         }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SetVisibility(int id, bool? expectedActive)
+        {
+            if (!ModelState.IsValid || !expectedActive.HasValue)
+            {
+                TempData["VisibilityError"] = "Yêu cầu không hợp lệ. Vui lòng tải lại trang.";
+                return RedirectToAction(nameof(Index));
+            }
+            var desired = !expectedActive.Value;
+            // Chỉ đổi trạng thái hiển thị; không ghi đè giá, tồn kho hay nội dung.
+            var changed = await _db.Products
+                .Where(p => p.Id == id && p.IsActive == expectedActive.Value)
+                .ExecuteUpdateAsync(s => s.SetProperty(p => p.IsActive, desired));
+            if (changed == 0)
+            {
+                TempData["VisibilityError"] = "Sản phẩm đã đổi trạng thái hoặc không còn tồn tại. Danh sách đã được tải lại.";
+            }
+            else
+            {
+                TempData["SuccessMessage"] = desired
+                    ? "Đã hiện bán lại sản phẩm. Tồn kho được giữ nguyên."
+                    : "Đã ngừng bán sản phẩm. Thông tin và lịch sử đơn hàng được giữ nguyên.";
+            }
+            return RedirectToAction(nameof(Index));
+        }
+
         private async Task LoadOptionsAsync(ProductFormViewModel model)
         {
             model.CategoryOptions = await _db.Categories
@@ -118,6 +145,7 @@ namespace CCMobile.Controllers
                 Sku = sku,
                 Name = name,
                 Price = model.Price!.Value,
+                SalePrice = model.SalePrice,
                 StockQuantity = model.StockQuantity!.Value,
                 ShortDescription = model.ShortDescription?.Trim(),
                 Description = model.Description?.Trim(),
@@ -321,6 +349,7 @@ namespace CCMobile.Controllers
                 Sku = product.Sku,
                 Name = product.Name,
                 Price = product.Price,
+                SalePrice = product.SalePrice,
                 StockQuantity = product.StockQuantity,
                 ShortDescription = product.ShortDescription,
                 Description = product.Description,
@@ -368,6 +397,7 @@ namespace CCMobile.Controllers
             product.Sku = model.Sku.Trim();
             product.Name = model.Name.Trim();
             product.Price = model.Price!.Value;
+            product.SalePrice = model.SalePrice;
             product.StockQuantity = model.StockQuantity!.Value;
             product.ShortDescription = model.ShortDescription?.Trim();
             product.Description = model.Description?.Trim();

@@ -1,0 +1,45 @@
+﻿@model CCMobile.ViewModels.StoreNavigationViewModel
+@{
+    var current = ViewContext.RouteData.Values["controller"]?.ToString();
+    var admin = User.IsInRole("Admin");
+}
+<nav class="cc-nav" aria-label="Điều hướng chính">
+<div class="cc-shell cc-nav-inner">
+@if (admin)
+{
+    <a asp-controller="Admin" asp-action="Index" aria-current="@(current == "Admin" ? "page" : null)">Tổng quan</a>
+    <a asp-controller="AdminProducts" asp-action="Index" aria-current="@(current == "AdminProducts" ? "page" : null)">Sản phẩm</a>
+    <a asp-controller="AdminOrders" asp-action="Index" aria-current="@(current == "AdminOrders" ? "page" : null)">Đơn hàng</a>
+    <a asp-controller="AdminCategories" asp-action="Index" aria-current="@(current == "AdminCategories" ? "page" : null)">Danh mục</a>
+    <a asp-controller="AdminBrands" asp-action="Index" aria-current="@(current == "AdminBrands" ? "page" : null)">Thương hiệu</a>
+    <a asp-controller="Products" asp-action="Index" class="cc-nav-last" aria-current="@(current == "Products" ? "page" : null)">Xem cửa hàng ↗</a>
+}
+else
+{
+    <a asp-controller="Products" asp-action="Index" aria-current="@(current == "Products" ? "page" : null)">Tất cả sản phẩm</a>
+    <details class="cc-menu" id="cc-discover">
+        <summary>Giúp bạn chọn <span aria-hidden="true">⌄</span></summary>
+        <div class="cc-mega">
+            <section><h2>Theo thương hiệu</h2>
+                @foreach (var brand in Model.Brands)
+                { <a asp-controller="Products" asp-action="Index" asp-route-brandId="@brand.Id">@brand.Name <span aria-hidden="true">↗</span></a> }
+                @if (!Model.Brands.Any()) { <p>Đang cập nhật thương hiệu.</p> }
+            </section>
+            <section><h2>Theo danh mục</h2>
+                @foreach (var category in Model.Categories)
+                { <a asp-controller="Products" asp-action="Index" asp-route-categoryId="@category.Id">@category.Name <span aria-hidden="true">↗</span></a> }
+            </section>
+            <section><h2>Theo ngân sách</h2>
+                <a asp-controller="Products" asp-action="Index" asp-route-budget="under5">Dưới 5 triệu</a>
+                <a asp-controller="Products" asp-action="Index" asp-route-budget="5to10">Từ 5 đến dưới 10 triệu</a>
+                <a asp-controller="Products" asp-action="Index" asp-route-budget="10plus">Từ 10 triệu trở lên</a>
+                <p class="cc-menu-note">Chọn một nhóm để khám phá sản phẩm phù hợp với bạn.</p>
+            </section>
+        </div>
+    </details>
+    @if (User.Identity?.IsAuthenticated == true)
+    { <a asp-controller="Orders" asp-action="Index" aria-current="@(current == "Orders" ? "page" : null)">Đơn hàng của tôi</a> }
+    <a asp-controller="Cart" asp-action="Index" class="cc-nav-last" aria-current="@(current == "Cart" ? "page" : null)">Giỏ hàng <span aria-hidden="true">↗</span></a>
+}
+</div>
+</nav>

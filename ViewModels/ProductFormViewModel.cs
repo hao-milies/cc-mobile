@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace CCMobile.ViewModels
 {
-    public class ProductFormViewModel
+    public class ProductFormViewModel : IValidatableObject
     {
         [Required(ErrorMessage = "Vui lòng nhập mã sản phẩm.")]
         [StringLength(50)]
@@ -18,8 +18,20 @@ namespace CCMobile.ViewModels
         [Required(ErrorMessage = "Vui lòng nhập giá bán.")]
         [Range(typeof(decimal), "1", "9999999999999999",
             ErrorMessage = "Giá bán phải lớn hơn 0 và nằm trong giới hạn cho phép.")]
-        [Display(Name = "Giá bán (VNĐ)")]
+        [Display(Name = "Giá gốc (VNĐ)")]
         public decimal? Price { get; set; }
+
+        [Range(typeof(decimal), "1", "9999999999999999",
+            ErrorMessage = "Giá khuyến mại phải lớn hơn 0.")]
+        [Display(Name = "Giá khuyến mại (VNĐ)")]
+        public decimal? SalePrice { get; set; }
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (SalePrice.HasValue && Price.HasValue && SalePrice.Value >= Price.Value)
+                yield return new ValidationResult("Giá khuyến mại phải nhỏ hơn giá gốc.", new[] { nameof(SalePrice) });
+        }
+
 
         [Required(ErrorMessage = "Vui lòng nhập số lượng tồn.")]
         [Range(0, int.MaxValue,

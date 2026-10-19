@@ -13,6 +13,11 @@
     {
         <div class="alert alert-success" role="status">@message</div>
     }
+    @if (TempData["VisibilityError"] is string visibilityError)
+    {
+        <div class="alert alert-warning" role="alert">@visibilityError</div>
+    }
+    <p class="small text-muted">Ngừng bán sẽ gỡ sản phẩm khỏi cửa hàng, giữ nguyên dữ liệu và tồn kho. Hết hàng là trạng thái tồn kho riêng.</p>
     @if (!Model.Any())
     {
         <div class="alert alert-light border">Chưa có sản phẩm.</div>
@@ -43,20 +48,32 @@
                             </td>
                             <td>@product.Brand.Name</td>
                             <td>@product.Category.Name</td>
-                            <td class="text-end text-nowrap">@product.Price.ToString("N0", culture) ₫</td>
+                            <td class="text-end text-nowrap"><strong class="@(product.HasDiscount ? "text-danger" : "")">@product.EffectivePrice.ToString("N0", culture) ₫</strong>
+                                @if (product.HasDiscount)
+                                { <small class="d-block text-muted"><del>@product.Price.ToString("N0", culture) ₫</del> · @(product.DiscountPercent > 0 ? "-" + product.DiscountPercent.ToString("0.#", culture) + "%" : "Ưu đãi")</small> }</td>
                             <td class="text-end">@product.StockQuantity</td>
                             <td>
                                 @if (product.IsActive)
                                 {
-                                    <span class="badge bg-success">Đang hiển thị</span>
+                                    <span class="badge bg-success">Đang bán</span>
                                 }
                                 else
                                 {
-                                    <span class="badge bg-secondary">Đang ẩn</span>
+                                    <span class="badge bg-secondary">Đã ngừng bán</span>
                                 }
                             </td>
                             <td>
                                 <div class="d-flex flex-wrap gap-2">
+                                    <form asp-action="SetVisibility" method="post"
+                                          onsubmit="return confirm(this.dataset.confirm)"
+                                          data-confirm="@(product.IsActive ? "Ngừng bán sản phẩm này? Sản phẩm sẽ được gỡ khỏi cửa hàng; đơn hàng cũ vẫn giữ nguyên." : "Hiện bán lại sản phẩm này trên cửa hàng?")">
+                                        <input type="hidden" name="id" value="@product.Id" />
+                                        <input type="hidden" name="expectedActive" value="@product.IsActive.ToString().ToLowerInvariant()" />
+                                        <button type="submit" class="btn btn-sm @(product.IsActive ? "btn-outline-danger" : "btn-outline-success")"
+                                                aria-label="@(product.IsActive ? "Ngừng bán " + product.Name : "Hiện bán lại " + product.Name)">
+                                            @(product.IsActive ? "Ngừng bán" : "Hiện bán lại")
+                                        </button>
+                                    </form>
                                     <a asp-action="Edit" asp-route-id="@product.Id"
                                        class="btn btn-sm btn-outline-dark">Sửa</a>
                                     <a asp-action="Images" asp-route-id="@product.Id"

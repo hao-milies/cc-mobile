@@ -1,0 +1,48 @@
+﻿@model CCMobile.ViewModels.AdminOrderListViewModel
+@using CCMobile.Services
+@using System.Globalization
+@{ ViewData["Title"] = "Quản lý đơn hàng"; var culture = CultureInfo.GetCultureInfo("vi-VN"); }
+<div class="py-4">
+    <a asp-controller="Admin" asp-action="Index">← Quản trị cửa hàng</a>
+    <h1 class="h3 my-3">Quản lý đơn hàng</h1>
+    <form method="get" class="row g-2 mb-4">
+        <div class="col-md-6">
+            <label for="search" class="form-label">Mã đơn, tên hoặc số điện thoại</label>
+            <input id="search" name="search" value="@Model.Search" maxlength="100" class="form-control" />
+        </div>
+        <div class="col-md-4">
+            <label for="status" class="form-label">Trạng thái</label>
+            <select id="status" name="status" class="form-select">
+                <option value="">Tất cả</option>
+                @foreach (var status in OrderWorkflow.Statuses)
+                { <option value="@status" selected="@(Model.Status == status)">@OrderWorkflow.Label(status)</option> }
+            </select>
+        </div>
+        <div class="col-md-2 d-flex align-items-end"><button class="btn btn-warning w-100">Tìm kiếm</button></div>
+    </form>
+    <p class="text-muted">@Model.TotalCount đơn hàng</p>
+    @if (Model.Orders.Count == 0) { <p>Không có đơn hàng phù hợp.</p> }
+    else
+    {
+        <div class="table-responsive"><table class="table align-middle">
+            <thead><tr><th>Mã đơn</th><th>Người nhận</th><th>Thời gian (VN)</th><th>Tổng tiền</th><th>Trạng thái</th><th></th></tr></thead>
+            <tbody>
+            @foreach (var order in Model.Orders)
+            {
+                <tr><td>#@order.Id</td><td>@order.RecipientName<small class="d-block">@order.PhoneNumber</small></td>
+                    <td>@order.CreatedAt.AddHours(7).ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>@order.Total.ToString("N0", culture) ₫</td>
+                    <td>@OrderWorkflow.Label(order.Status)</td>
+                    <td><a asp-action="Details" asp-route-id="@order.Id" class="btn btn-sm btn-outline-dark">Xem đơn</a></td></tr>
+            }
+            </tbody>
+        </table></div>
+    }
+    <nav aria-label="Phân trang đơn hàng" class="d-flex align-items-center gap-3 mt-3">
+        @if (Model.Page > 1)
+        { <a asp-action="Index" asp-route-page="@(Model.Page - 1)" asp-route-status="@Model.Status" asp-route-search="@Model.Search" class="btn btn-outline-dark">Trang trước</a> }
+        <span>Trang @Model.Page / @Model.TotalPages</span>
+        @if (Model.Page < Model.TotalPages)
+        { <a asp-action="Index" asp-route-page="@(Model.Page + 1)" asp-route-status="@Model.Status" asp-route-search="@Model.Search" class="btn btn-outline-dark">Trang sau</a> }
+    </nav>
+</div>

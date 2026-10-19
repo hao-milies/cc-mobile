@@ -1,0 +1,7 @@
+﻿@model CCMobile.ViewModels.ProductFormViewModel
+<div class="mb-3 border rounded p-3" style="background:#fff4cc">
+    <label asp-for="SalePrice" class="form-label fw-semibold"></label>
+    <input asp-for="SalePrice" type="number" min="1" step="1" class="form-control" aria-describedby="sale-help" />
+    <div id="sale-help" class="form-text">Nhập giá thấp hơn giá gốc để bật khuyến mại. Xóa ô này rồi lưu để kết thúc. Có hiệu lực ngay khi lưu.</div>
+    <span asp-validation-for="SalePrice" class="text-danger small"></span>
+</div>

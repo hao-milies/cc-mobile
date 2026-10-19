@@ -1,0 +1,20 @@
+﻿@model CCMobile.Models.Order
+@if (Model.CancellationRequests.Any())
+{
+    <section class="border rounded p-3 my-4">
+        <h2 class="h5">Lịch sử yêu cầu hủy</h2>
+        @foreach (var request in Model.CancellationRequests.OrderByDescending(x => x.RequestedAt))
+        {
+            <article class="border-top pt-3 mt-3">
+                <p class="small text-muted">@request.RequestedAt.AddHours(7).ToString("dd/MM/yyyy HH:mm") (giờ Việt Nam)</p>
+                <p style="white-space:pre-line"><strong>Lý do:</strong> @request.Reason</p>
+                <p><strong>Kết quả:</strong> @(request.Decision == "Pending" ? "Đang chờ duyệt" : request.Decision == "Approved" ? "Đồng ý hủy" : "Từ chối hủy")</p>
+                @if (request.ReviewedAt.HasValue)
+                {
+                    <p style="white-space:pre-line"><strong>Phản hồi của cửa hàng:</strong> @request.Response</p>
+                    <p class="small text-muted">Xét duyệt lúc @request.ReviewedAt.Value.AddHours(7).ToString("dd/MM/yyyy HH:mm")</p>
+                }
+            </article>
+        }
+    </section>
+}

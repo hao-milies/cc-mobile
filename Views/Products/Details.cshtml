@@ -65,9 +65,17 @@
             <p class="text-muted small">Mã sản phẩm: @Model.Sku</p>
 
             <p class="cc-price">
-                @Model.Price.ToString("N0", culture) ₫
+                @Model.EffectivePrice.ToString("N0", culture) ₫
             </p>
 
+            @if (Model.HasDiscount)
+            {
+                <div class="cc-detail-discount mb-3">
+                    <del>@Model.Price.ToString("N0", culture) ₫</del>
+                    <span class="cc-sale-pill">@(Model.DiscountPercent > 0 ? "Giảm " + Model.DiscountPercent.ToString("0.#", culture) + "%" : "Giá khuyến mại")</span>
+                    <p class="small mb-0 mt-2">Tiết kiệm @((Model.Price - Model.EffectivePrice).ToString("N0", culture)) ₫</p>
+                </div>
+            }
             @if (Model.StockQuantity > 0)
             {
                 <span class="cc-stock">Còn hàng</span>
@@ -106,6 +114,12 @@
                 </div>
             </dl>
 
+            @if (User.IsInRole("Admin"))
+            {
+                <a asp-controller="AdminProducts" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning my-4">Chỉnh sửa sản phẩm</a>
+            }
+            else
+            {
             @if (Model.StockQuantity > 0)
             {
                 <form asp-controller="Cart" asp-action="Add" method="post" class="my-4">
@@ -124,6 +138,7 @@
             else
             {
                 <button type="button" class="btn btn-secondary w-100 my-4" disabled>Tạm hết hàng</button>
+            }
             }
 
             @if (specs != null)

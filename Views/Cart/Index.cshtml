@@ -50,7 +50,10 @@
                                 <span>@item.Name</span>
                             </a>
                         </td>
-                        <td class="text-nowrap">@item.Price.ToString("N0", culture) ₫</td>
+                        <td class="text-nowrap"><strong class="text-danger">@item.Price.ToString("N0", culture) ₫</strong>
+                            @if (item.OriginalPrice > item.Price)
+                            { <del class="d-block small text-muted">@item.OriginalPrice.ToString("N0", culture) ₫</del> }
+                        </td>
                         <td>
                             <form asp-action="Update" method="post" class="d-flex gap-2">
                                 <input type="hidden" name="productId" value="@item.ProductId" />
@@ -79,6 +82,7 @@
             <p class="text-muted small">Giá và tồn kho có thể thay đổi. Thêm vào giỏ chưa giữ hàng.</p>
         </div>
         <div class="d-flex flex-wrap gap-3">
+            <a asp-controller="Orders" asp-action="Checkout" class="btn btn-dark">Tiến hành đặt hàng</a>
             <a asp-controller="Products" asp-action="Index" class="btn btn-warning">Tiếp tục mua sắm</a>
             <form asp-action="Clear" method="post" onsubmit="return confirm('Xóa tất cả sản phẩm khỏi giỏ?');">
                 <button type="submit" class="btn btn-outline-danger">Xóa giỏ hàng</button>

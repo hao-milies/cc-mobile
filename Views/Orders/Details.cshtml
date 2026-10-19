@@ -1,0 +1,53 @@
+﻿@model CCMobile.Models.Order
+@using System.Globalization
+@using CCMobile.Services
+@{ ViewData["Title"] = $"Đơn hàng #{Model.Id}"; var culture = CultureInfo.GetCultureInfo("vi-VN"); }
+<div class="py-4">
+    @if (TempData["OrderSuccess"] is string success)
+    { <div class="alert alert-success" role="status">@success</div> }
+    <h1 class="h3">Đơn hàng #@Model.Id</h1>
+    <p>@Model.CreatedAt.AddHours(7).ToString("dd/MM/yyyy HH:mm") (giờ Việt Nam) · @OrderWorkflow.Label(Model.Status)</p>
+    @if (TempData["OrderError"] is string error)
+    { <div class="alert alert-danger" role="alert">@error</div> }
+    @if (Model.Status == "CancellationRequested")
+    {
+        <div class="alert alert-warning">Bạn đã yêu cầu hủy. Đơn tạm dừng xử lý để chờ cửa hàng xét duyệt.</div>
+    }
+    @if (OrderWorkflow.CanRequestCancellation(Model.Status))
+    {
+        <details class="border rounded p-3 my-4">
+            <summary class="fw-semibold">Yêu cầu hủy đơn</summary>
+            <p class="mt-3 text-muted">Đơn chỉ được hủy sau khi cửa hàng đồng ý.</p>
+            <form asp-action="RequestCancellation" method="post">
+                <input type="hidden" name="id" value="@Model.Id" />
+                <label for="cancelReason" class="form-label">Lý do hủy</label>
+                <textarea id="cancelReason" name="reason" class="form-control mb-3" rows="3" required maxlength="1000"></textarea>
+                <button class="btn btn-outline-danger" type="submit">Gửi yêu cầu hủy</button>
+            </form>
+        </details>
+    }
+    <partial name="_CancellationHistory" model="Model" />
+    <div class="border rounded p-3 my-4">
+        <h2 class="h5">Thông tin nhận hàng</h2>
+        <p>@Model.RecipientName · @Model.PhoneNumber</p>
+        <p style="white-space: pre-line">@Model.ShippingAddress</p>
+        @if (!string.IsNullOrWhiteSpace(Model.Note)) { <p>Ghi chú: @Model.Note</p> }
+        <p class="mb-0">Thanh toán khi nhận hàng (COD) · @OrderWorkflow.PaymentLabel(Model.Status)</p>
+    </div>
+    <div class="table-responsive">
+        <table class="table">
+            <thead><tr><th>Sản phẩm</th><th>Đơn giá lúc đặt</th><th>Số lượng</th><th>Thành tiền</th></tr></thead>
+            <tbody>
+            @foreach (var item in Model.Items)
+            {
+                <tr><td>@item.ProductName <small class="d-block text-muted">@item.Sku</small></td>
+                    <td>@item.UnitPrice.ToString("N0", culture) ₫</td><td>@item.Quantity</td>
+                    <td>@item.Subtotal.ToString("N0", culture) ₫</td></tr>
+            }
+            </tbody>
+        </table>
+    </div>
+    <p class="text-end">Phí giao hàng: Miễn phí</p>
+    <p class="fs-5 text-end fw-bold">Tổng thanh toán: @Model.Total.ToString("N0", culture) ₫</p>
+    <a asp-action="Index" class="btn btn-outline-dark">Đơn hàng của tôi</a>
+</div>

@@ -1,0 +1,87 @@
+﻿@model CCMobile.Models.Order
+@using System.Globalization
+@using CCMobile.Services
+@{ ViewData["Title"] = $"Đơn hàng #{Model.Id}"; var culture = CultureInfo.GetCultureInfo("vi-VN"); }
+<div class="py-4">
+    @if (TempData["AdminOrderSuccess"] is string success)
+    { <div class="alert alert-success" role="status">@success</div> }
+    @if (TempData["AdminOrderError"] is string error) { <div class="alert alert-danger" role="alert">@error</div> }
+    <h1 class="h3">Đơn hàng #@Model.Id</h1>
+    <p>@Model.CreatedAt.AddHours(7).ToString("dd/MM/yyyy HH:mm") (giờ Việt Nam) · @OrderWorkflow.Label(Model.Status)</p>
+
+    <section class="border rounded p-3 mb-4">
+        <h2 class="h5">Xử lý đơn hàng</h2>
+        <p class="text-muted">Chỉ đánh dấu hoàn tất sau khi giao thành công và thu đủ tiền COD.</p>
+        <div class="d-flex gap-2 flex-wrap">
+        @foreach (var target in OrderWorkflow.Statuses.Where(x => OrderWorkflow.CanMove(Model.Status, x)))
+        {
+            var caption = target switch {
+                "Confirmed" => "Xác nhận đơn",
+                "Shipping" => "Bắt đầu giao hàng",
+                "Completed" => "Đã giao và thu đủ tiền",
+                _ => "Hủy đơn và hoàn kho"
+            };
+            var prompt = target == "Cancelled"
+                ? "Hủy đơn và cộng lại toàn bộ số lượng vào kho?"
+                : target == "Completed" ? "Đã giao thành công và thu đủ tiền COD?" : "Xác nhận cập nhật trạng thái?";
+            <form asp-action="ChangeStatus" method="post" onsubmit="return confirm(this.dataset.confirm)" data-confirm="@prompt">
+                <input type="hidden" name="id" value="@Model.Id" />
+                <input type="hidden" name="expectedStatus" value="@Model.Status" />
+                <input type="hidden" name="targetStatus" value="@target" />
+                <button type="submit" class="btn @(target == "Cancelled" ? "btn-outline-danger" : "btn-warning")">@caption</button>
+            </form>
+        }
+        </div>
+        @if (Model.Status == "Shipping") { <p class="small mt-3 mb-0">Đơn đang giao chưa hỗ trợ hủy trực tiếp. Quy trình trả hàng sẽ được bổ sung riêng.</p> }
+        @if (Model.Status == "Completed" || Model.Status == "Cancelled") { <p class="mb-0">Đơn đã kết thúc, không thể chuyển trạng thái thêm.</p> }
+    </section>
+    @if (Model.Status == "CancellationRequested")
+    {
+        var pendingRequest = Model.CancellationRequests.SingleOrDefault(x => x.Decision == "Pending");
+        <div class="alert alert-warning">Khách yêu cầu hủy đơn. Hãy xét duyệt trước khi tiếp tục xử lý đơn.</div>
+        @if (pendingRequest != null)
+        {
+            <section class="border rounded p-3 my-4">
+                <h2 class="h5">Xét duyệt yêu cầu hủy</h2>
+                <p style="white-space:pre-line"><strong>Lý do khách gửi:</strong> @pendingRequest.Reason</p>
+                <form asp-action="ReviewCancellation" method="post">
+                    <input type="hidden" name="id" value="@Model.Id" />
+                    <input type="hidden" name="requestId" value="@pendingRequest.Id" />
+                    <label for="reviewResponse" class="form-label">Phản hồi cho khách (bắt buộc)</label>
+                    <textarea id="reviewResponse" name="response" rows="3" maxlength="1000" required class="form-control mb-3"></textarea>
+                    <label for="reviewDecision" class="form-label">Quyết định</label>
+                    <select id="reviewDecision" name="decision" required class="form-select mb-3">
+                        <option value="">Chọn quyết định</option>
+                        <option value="Approve">Đồng ý hủy và hoàn kho</option>
+                        <option value="Reject">Từ chối hủy, tiếp tục đơn hàng</option>
+                    </select>
+                    <button type="submit" class="btn btn-warning">Lưu quyết định</button>
+                </form>
+            </section>
+        }
+    }
+    <partial name="_CancellationHistory" model="Model" />
+    <div class="border rounded p-3 my-4">
+        <h2 class="h5">Thông tin nhận hàng</h2>
+        <p>@Model.RecipientName · @Model.PhoneNumber</p>
+        <p style="white-space: pre-line">@Model.ShippingAddress</p>
+        @if (!string.IsNullOrWhiteSpace(Model.Note)) { <p>Ghi chú: @Model.Note</p> }
+        <p class="mb-0">Thanh toán khi nhận hàng (COD) · @OrderWorkflow.PaymentLabel(Model.Status)</p>
+    </div>
+    <div class="table-responsive">
+        <table class="table">
+            <thead><tr><th>Sản phẩm</th><th>Đơn giá lúc đặt</th><th>Số lượng</th><th>Thành tiền</th></tr></thead>
+            <tbody>
+            @foreach (var item in Model.Items)
+            {
+                <tr><td>@item.ProductName <small class="d-block text-muted">@item.Sku</small></td>
+                    <td>@item.UnitPrice.ToString("N0", culture) ₫</td><td>@item.Quantity</td>
+                    <td>@item.Subtotal.ToString("N0", culture) ₫</td></tr>
+            }
+            </tbody>
+        </table>
+    </div>
+    <p class="text-end">Phí giao hàng: Miễn phí</p>
+    <p class="fs-5 text-end fw-bold">Tổng thanh toán: @Model.Total.ToString("N0", culture) ₫</p>
+    <a asp-action="Index" class="btn btn-outline-dark">Danh sách đơn hàng</a>
+</div>

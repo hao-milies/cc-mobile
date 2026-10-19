@@ -1,184 +1,87 @@
 ﻿@model IEnumerable<CCMobile.Models.Product>
 @using System.Globalization
-
 @{
     ViewData["Title"] = "Điện thoại và phụ kiện";
     var culture = CultureInfo.GetCultureInfo("vi-VN");
-    var search = ViewData["Search"] as string;
+    var saleOnly = ViewData["SaleOnly"] is true;
+    var discountCount = ViewData["DiscountCount"] is int count ? count : 0;
 }
-@if (TempData["SuccessMessage"] is string successMessage)
-{
-    <div class="alert alert-success" role="status">
-        @successMessage
+@if (TempData["SuccessMessage"] is string success) { <div class="alert alert-success">@success</div> }
+<section class="cc-deal-hero">
+    <div class="cc-deal-copy">
+        <p class="cc-kicker">CC MOBILE / ĐIỆN THOẠI & PHỤ KIỆN</p>
+        <h1>Chọn máy đúng gu.<br /><span>Giá hợp túi tiền.</span></h1>
+        <p>Điện thoại, phụ kiện và những lựa chọn dành cho bạn.</p>
+        <a href="#catalogue" class="cc-deal-button">Khám phá ngay <span aria-hidden="true">↘</span></a>
     </div>
-}
-
-<div class="py-4">
-    <div class="mb-5">
-        <h1 class="display-5 fw-bold">Điện thoại và phụ kiện</h1>
-        <p class="lead text-muted">
-            Khám phá điện thoại và phụ kiện phù hợp với bạn.
-        </p>
+    <div class="cc-deal-art" aria-hidden="true">
+        <span class="cc-deal-orbit">CC / MOBILE</span>
+        <div class="cc-deal-ticket"><small>CHỌN CHẤT RIÊNG</small><strong>GOOD<br />CALL!</strong><span>ĐIỆN THOẠI + PHỤ KIỆN</span></div>
+        <span class="cc-deal-star">✦</span>
     </div>
-
-    <form asp-controller="Products"
-          asp-action="Index"
-          method="get"
-          class="mb-4">
-
-        <div class="row g-3 align-items-end">
-            <div class="col-12 col-lg-5">
-                <label for="product-search" class="form-label">
-                    Tìm sản phẩm
-                </label>
-
-                <input id="product-search"
-                       name="search"
-                       type="search"
-                       value="@search"
-                       class="form-control"
-                       placeholder="Tên điện thoại hoặc mã sản phẩm..." />
-            </div>
-
-            <div class="col-6 col-lg-3">
-                <label for="brand-filter" class="form-label">
-                    Thương hiệu
-                </label>
-
-                <select id="brand-filter"
-                        name="brandId"
-                        asp-items="ViewBag.BrandOptions"
-                        class="form-select">
-                    <option value="">Tất cả thương hiệu</option>
-                </select>
-            </div>
-
-            <div class="col-6 col-lg-2">
-                <label for="sort-filter" class="form-label">
-                    Sắp xếp
-                </label>
-
-                <select id="sort-filter"
-                        name="sort"
-                        asp-items="ViewBag.SortOptions"
-                        class="form-select">
-                </select>
-            </div>
-
-            <div class="col-12 col-lg-2">
-                <button type="submit"
-                        class="btn btn-warning w-100 text-dark fw-semibold">
-                    Áp dụng
-                </button>
-            </div>
+</section>
+<div class="cc-shopping-tabs" aria-label="Chọn nhóm sản phẩm">
+    <a asp-action="Index" class="@(!saleOnly ? "selected" : "")">Tất cả sản phẩm</a>
+    <a asp-action="Index" asp-route-saleOnly="true" class="@(saleOnly ? "selected" : "")">✦ Đang giảm giá <span>@discountCount</span></a>
+    <a asp-action="Index" asp-route-budget="under5">Dưới 5 triệu</a>
+    <a asp-action="Index" asp-route-budget="5to10">5–10 triệu</a>
+    <a asp-action="Index" asp-route-budget="10plus">Từ 10 triệu</a>
+</div>
+<section id="catalogue" class="cc-catalogue-section">
+    <div class="cc-catalogue-title">
+        <h2>@(saleOnly ? "Giá mới. Lựa chọn mới." : "Điện thoại & phụ kiện")</h2>
+        <span>@Model.Count() sản phẩm</span>
+    </div>
+    @if (discountCount > 0 && !saleOnly)
+    {
+        <div class="cc-deal-strip"><strong>✦ CÓ GIÁ MỚI!</strong><span>@discountCount sản phẩm đang có giá khuyến mại.</span><a asp-action="Index" asp-route-saleOnly="true">Xem ưu đãi →</a></div>
+    }
+    <form asp-controller="Products" asp-action="Index" method="get" class="cc-filters">
+        <input type="hidden" name="search" value="@ViewData["Search"]" />
+        <div class="row g-2 align-items-end">
+            <div class="col-6 col-lg-3"><label for="brand-filter" class="form-label">Thương hiệu</label><select id="brand-filter" name="brandId" asp-items="ViewBag.BrandOptions" class="form-select"><option value="">Tất cả thương hiệu</option></select></div>
+            <div class="col-6 col-lg-2"><label for="category-filter" class="form-label">Danh mục</label><select id="category-filter" name="categoryId" asp-items="ViewBag.CategoryOptions" class="form-select"><option value="">Tất cả danh mục</option></select></div>
+            <div class="col-6 col-lg-3"><label for="budget-filter" class="form-label">Khoảng giá</label><select id="budget-filter" name="budget" asp-items="ViewBag.BudgetOptions" class="form-select"><option value="">Mọi mức giá</option></select></div>
+            <div class="col-6 col-lg-2"><label for="sort-filter" class="form-label">Sắp xếp</label><select id="sort-filter" name="sort" asp-items="ViewBag.SortOptions" class="form-select"></select></div>
+            <div class="col-12 col-lg-2"><button class="btn btn-warning w-100" type="submit">Áp dụng</button></div>
         </div>
-
-        <div class="d-flex justify-content-between align-items-center mt-3">
-            <span class="text-muted">
-                @Model.Count() sản phẩm
-            </span>
-
-            <a asp-controller="Products"
-               asp-action="Index"
-               class="text-dark">
-                Xóa bộ lọc
-            </a>
+        <div class="d-flex justify-content-between flex-wrap gap-2 mt-3 small">
+            <label class="d-flex align-items-center gap-2"><input type="checkbox" name="saleOnly" value="true" checked="@saleOnly" class="form-check-input mt-0" /> Chỉ hiện sản phẩm giảm giá</label>
+            @if (ViewData["Search"] is string term && !string.IsNullOrWhiteSpace(term)) { <span>Kết quả cho “@term”</span> }
+            <a asp-action="Index">Xóa bộ lọc</a>
         </div>
     </form>
-
-    @if (!string.IsNullOrWhiteSpace(search))
-    {
-        <p class="text-muted">
-            Tìm thấy <strong>@Model.Count()</strong>
-            sản phẩm cho “@search”.
-        </p>
-    }
-
     @if (!Model.Any())
     {
-        <div class="alert alert-light border">
-            Không có sản phẩm phù hợp.
-            Hãy thử từ khóa khác hoặc xóa bộ lọc.
-        </div>
+        <div class="alert alert-light border p-4"><h3 class="h5">Chưa tìm thấy sản phẩm phù hợp</h3><p>Thử đổi bộ lọc hoặc tìm một tên sản phẩm khác.</p><a asp-action="Index">Xem tất cả sản phẩm</a></div>
     }
     else
     {
-        <div class="row g-4">
-            @foreach (var product in Model)
-            {
-                var coverImage = product.Images
-       .OrderByDescending(i => i.IsPrimary)
-       .ThenBy(i => i.DisplayOrder)
-       .FirstOrDefault();
-
-                
-                <div class="col-12 col-sm-6 col-lg-4">
-                    <article class="card h-100 border-0 shadow-sm">
-                        <a asp-controller="Products"
-                           asp-action="Details"
-                           asp-route-id="@product.Id"
-                           aria-label="Xem chi tiết @product.Name"
-                           class="text-decoration-none">
-
-                            <div class="bg-white d-flex align-items-center
-                                justify-content-center rounded-top"
-                                 style="height: 260px;">
-
-                                @if (coverImage != null)
-                                {
-                                    <img src="@Url.Content(coverImage.ImageUrl)"
-                                         alt="@(coverImage.AltText ?? product.Name)"
-                                         loading="lazy"
-                                         style="width: 100%; height: 100%;
-                                    object-fit: contain; padding: 20px;" />
-                                }
-                                else
-                                {
-                                    <span class="text-muted">
-                                        Chưa có ảnh sản phẩm
-                                    </span>
-                                }
-                            </div>
-                        </a>
-
-                        <div class="card-body p-4">
-                            <p class="text-muted small mb-2">
-                                @product.Brand.Name
-                            </p>
-
-                            <h2 class="h5">
-                                <a asp-controller="Products"
-                                   asp-action="Details"
-                                   asp-route-id="@product.Id"
-                                   class="text-decoration-none text-dark">
-                                    @product.Name
-                                </a>
-                            </h2>
-
-                            <p class="text-muted small">
-                                @product.ShortDescription
-                            </p>
-
-                            <p class="fs-5 fw-bold mb-2">
-                                @product.Price.ToString("N0", culture) ₫
-                            </p>
-
-                            @if (product.StockQuantity > 0)
-                            {
-                                <span class="small text-success">
-                                    Còn hàng
-                                </span>
-                            }
-                            else
-                            {
-                                <span class="small text-secondary">
-                                    Tạm hết hàng
-                                </span>
-                            }
-                        </div>
-                    </article>
+        <div class="cc-product-grid">
+        @foreach (var product in Model)
+        {
+            var cover = product.Images.OrderByDescending(x => x.IsPrimary).ThenBy(x => x.DisplayOrder).FirstOrDefault();
+            <article class="cc-product-card @(product.HasDiscount ? "cc-on-sale" : "")">
+                @if (product.HasDiscount)
+                { <span class="cc-card-discount">@(product.DiscountPercent > 0 ? "-" + product.DiscountPercent.ToString("0.#", culture) + "%" : "Ưu đãi")</span> }
+                <a asp-action="Details" asp-route-id="@product.Id" class="cc-card-image" aria-label="Xem @product.Name">
+                    @if (cover != null) { <img src="@Url.Content(cover.ImageUrl)" alt="@(cover.AltText ?? product.Name)" loading="lazy" width="300" height="200" /> }
+                    else { <span>Ảnh đang cập nhật</span> }
+                </a>
+                <div class="cc-card-body">
+                    <p class="cc-card-brand">@product.Brand.Name</p>
+                    <h3><a asp-action="Details" asp-route-id="@product.Id">@product.Name</a></h3>
+                    <p class="cc-card-summary">@product.ShortDescription</p>
+                    <div class="cc-card-bottom"><div>
+                        <p class="cc-card-price">@product.EffectivePrice.ToString("N0", culture) ₫</p>
+                        @if (product.HasDiscount)
+                        { <p class="cc-card-was"><del>@product.Price.ToString("N0", culture) ₫</del><span>Giá gốc</span></p> }
+                        <span class="cc-card-stock">@(product.StockQuantity > 0 ? "● Còn hàng" : "Tạm hết hàng")</span>
+                    </div></div>
+                    <a asp-action="Details" asp-route-id="@product.Id" class="cc-card-cta">Xem sản phẩm <span aria-hidden="true">↗</span></a>
                 </div>
-            }
+            </article>
+        }
         </div>
     }
-</div>
+</section>

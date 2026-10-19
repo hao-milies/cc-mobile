@@ -35,7 +35,8 @@ namespace CCMobile.Controllers
                     {
                         ProductId = product.Id,
                         Name = product.Name,
-                        Price = product.Price,
+                        Price = product.EffectivePrice,
+                        OriginalPrice = product.Price,
                         Quantity = entry.Value,
                         MaxQuantity = Math.Min(SessionCart.MaxQuantity, product.StockQuantity),
                         ImageUrl = product.Images.OrderByDescending(i => i.IsPrimary)

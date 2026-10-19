@@ -14,6 +14,7 @@
         public string Name { get; set; } = string.Empty;
         public string? ImageUrl { get; set; }
         public decimal Price { get; set; }
+        public decimal OriginalPrice { get; set; }
         public int Quantity { get; set; }
         public int MaxQuantity { get; set; }
         public decimal Subtotal => Price * Quantity;

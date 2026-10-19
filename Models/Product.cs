@@ -19,6 +19,18 @@
             ErrorMessage = "Giá phải lớn hơn 0 và nằm trong giới hạn cho phép.")]
         public decimal Price { get; set; }
 
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal? SalePrice { get; set; }
+
+        [NotMapped]
+        public bool HasDiscount => SalePrice.HasValue && SalePrice.Value > 0 && SalePrice.Value < Price;
+        [NotMapped]
+        public decimal EffectivePrice => HasDiscount ? SalePrice!.Value : Price;
+        [NotMapped]
+        public decimal DiscountPercent => HasDiscount
+            ? decimal.Floor((Price - EffectivePrice) / Price * 1000m) / 10m : 0;
+
+
         [Range(0, int.MaxValue,
             ErrorMessage = "Số lượng tồn kho không được âm.")]
         public int StockQuantity { get; set; }
