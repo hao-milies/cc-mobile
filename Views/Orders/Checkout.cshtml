@@ -1,14 +1,15 @@
-﻿@model CCMobile.ViewModels.CheckoutViewModel
+﻿@using CCMobile.Localization
+@model CCMobile.ViewModels.CheckoutViewModel
 @using System.Globalization
-@{ ViewData["Title"] = "Đặt hàng"; var culture = CultureInfo.GetCultureInfo("vi-VN"); }
+@{ ViewData["Title"] = StoreText.T("Đặt hàng"); var culture = CultureInfo.GetCultureInfo("vi-VN"); }
 <div class="py-4">
-    <h1 class="h3 mb-4">Xác nhận đặt hàng</h1>
+    <h1 class="h3 mb-4">@StoreText.T("Xác nhận đặt hàng")</h1>
     <form asp-action="Checkout" method="post">
         <input asp-for="Ticket" type="hidden" />
         <div asp-validation-summary="All" class="text-danger" role="alert"></div>
         <div class="row g-4">
             <div class="col-lg-6">
-                <h2 class="h5">Thông tin nhận hàng</h2>
+                <h2 class="h5">@StoreText.T("Thông tin nhận hàng")</h2>
                 <div class="mb-3">
                     <label asp-for="RecipientName" class="form-label"></label>
                     <input asp-for="RecipientName" class="form-control" autocomplete="name" />
@@ -22,7 +23,7 @@
                 <div class="mb-3">
                     <label asp-for="ShippingAddress" class="form-label"></label>
                     <textarea asp-for="ShippingAddress" class="form-control" rows="3" autocomplete="street-address"></textarea>
-                    <div class="form-text">Ghi rõ số nhà, đường, phường/xã và tỉnh/thành phố.</div>
+                    <div class="form-text">@StoreText.T("Ghi rõ số nhà, đường, phường/xã và tỉnh/thành phố.")</div>
                     <span asp-validation-for="ShippingAddress" class="text-danger"></span>
                 </div>
                 <div class="mb-3">
@@ -33,7 +34,7 @@
             </div>
             <div class="col-lg-6">
                 <div class="border rounded p-4">
-                    <h2 class="h5">Đơn hàng của bạn</h2>
+                    <h2 class="h5">@StoreText.T("Đơn hàng của bạn")</h2>
                     @foreach (var line in Model.Lines)
                     {
                         <div class="d-flex justify-content-between gap-3 border-bottom py-3">
@@ -41,11 +42,11 @@
                             <strong class="text-nowrap">@((line.Price * line.Quantity).ToString("N0", culture)) ₫</strong>
                         </div>
                     }
-                    <p class="mt-3">Phí giao hàng: <strong>Miễn phí</strong></p>
-                    <p class="fs-5">Tổng thanh toán: <strong>@Model.Total.ToString("N0", culture) ₫</strong></p>
-                    <p>Thanh toán khi nhận hàng (COD).</p>
-                    <button type="submit" class="btn btn-warning w-100">Xác nhận đặt hàng</button>
-                    <a asp-controller="Cart" asp-action="Index" class="btn btn-link mt-2">Quay lại giỏ hàng</a>
+                    <p class="mt-3">@StoreText.T("Phí giao hàng:") <strong>@StoreText.T("Miễn phí")</strong></p>
+                    <p class="fs-5">@StoreText.T("Tổng thanh toán:") <strong>@Model.Total.ToString("N0", culture) ₫</strong></p>
+                    <p>@StoreText.T("Thanh toán khi nhận hàng (COD).")</p>
+                    <button type="submit" class="btn btn-warning w-100">@StoreText.T("Xác nhận đặt hàng")</button>
+                    <a asp-controller="Cart" asp-action="Index" class="btn btn-link mt-2">@StoreText.T("Quay lại giỏ hàng")</a>
                 </div>
             </div>
         </div>

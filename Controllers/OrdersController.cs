@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿using CCMobile.Localization;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text.Json;
 using CCMobile.Data;
@@ -51,12 +52,12 @@ public class OrdersController : Controller
         reason = reason?.Trim();
         if (string.IsNullOrWhiteSpace(reason) || reason.Length > 1000)
         {
-            TempData["OrderError"] = "Vui lòng nhập lý do hủy từ 1 đến 1000 ký tự.";
+            TempData["OrderError"] = StoreText.T("Vui lòng nhập lý do hủy từ 1 đến 1000 ký tự.");
             return RedirectToAction(nameof(Details), new { id });
         }
         if (!OrderWorkflow.CanRequestCancellation(order.Status))
         {
-            TempData["OrderError"] = "Chỉ gửi yêu cầu hủy khi đơn chưa giao và chưa có yêu cầu đang chờ.";
+            TempData["OrderError"] = StoreText.T("Chỉ gửi yêu cầu hủy khi đơn chưa giao và chưa có yêu cầu đang chờ.");
             return RedirectToAction(nameof(Details), new { id });
         }
         await using var transaction = await _db.Database.BeginTransactionAsync();
@@ -65,7 +66,7 @@ public class OrdersController : Controller
         if (changed != 1)
         {
             await transaction.RollbackAsync();
-            TempData["OrderError"] = "Trạng thái đơn vừa thay đổi. Vui lòng kiểm tra lại.";
+            TempData["OrderError"] = StoreText.T("Trạng thái đơn vừa thay đổi. Vui lòng kiểm tra lại.");
             return RedirectToAction(nameof(Details), new { id });
         }
         _db.OrderCancellationRequests.Add(new OrderCancellationRequest
@@ -74,7 +75,7 @@ public class OrdersController : Controller
         });
         await _db.SaveChangesAsync();
         await transaction.CommitAsync();
-        TempData["OrderSuccess"] = "Đã gửi yêu cầu hủy. Đơn chờ cửa hàng xét duyệt; chưa hoàn kho.";
+        TempData["OrderSuccess"] = StoreText.T("Đã gửi yêu cầu hủy. Đơn chờ cửa hàng xét duyệt; chưa hoàn kho.");
         return RedirectToAction(nameof(Details), new { id });
     }
 
@@ -88,10 +89,10 @@ public class OrdersController : Controller
         if (SessionCart.Normalize(cart, products))
         {
             SessionCart.Write(HttpContext.Session, cart);
-            return BackToCart("Tồn kho hoặc trạng thái sản phẩm đã thay đổi. Vui lòng kiểm tra lại giỏ hàng.");
+            return BackToCart(StoreText.T("Tồn kho hoặc trạng thái sản phẩm đã thay đổi. Vui lòng kiểm tra lại giỏ hàng."));
         }
         if (cart.Count == 0 || cart.Count > SessionCart.MaxLines)
-            return BackToCart("Vui lòng thêm sản phẩm vào giỏ trước khi đặt hàng.");
+            return BackToCart(StoreText.T("Vui lòng thêm sản phẩm vào giỏ trước khi đặt hàng."));
         var lines = products.OrderBy(x => x.Id).Select(x => new CheckoutLine
         {
             ProductId = x.Id, Name = x.Name, Price = x.EffectivePrice, Quantity = cart[x.Id]
@@ -116,22 +117,22 @@ public class OrdersController : Controller
         CheckoutTicket? ticket;
         try { ticket = JsonSerializer.Deserialize<CheckoutTicket>(_protector.Unprotect(model.Ticket ?? "")); }
         catch (Exception ex) when (ex is CryptographicException or JsonException or ArgumentException)
-        { return BackToCart("Phiên đặt hàng không hợp lệ. Vui lòng thử lại."); }
+        { return BackToCart(StoreText.T("Phiên đặt hàng không hợp lệ. Vui lòng thử lại.")); }
         if (ticket == null || ticket.UserId != UserId)
-            return BackToCart("Phiên đặt hàng không hợp lệ.");
+            return BackToCart(StoreText.T("Phiên đặt hàng không hợp lệ."));
 
         // Một lần xác nhận chỉ tạo một đơn, kể cả khi gửi lại cùng biểu mẫu.
         var existing = await _db.Orders.AsNoTracking()
             .FirstOrDefaultAsync(x => x.CheckoutKey == ticket.Key && x.UserId == UserId);
         if (existing != null) return RedirectToAction(nameof(Details), new { id = existing.Id });
         if (ticket.ExpiresAt < DateTime.UtcNow)
-            return BackToCart("Phiên đặt hàng đã hết hạn. Vui lòng xác nhận lại.");
+            return BackToCart(StoreText.T("Phiên đặt hàng đã hết hạn. Vui lòng xác nhận lại."));
 
         await HttpContext.Session.LoadAsync();
         var cart = SessionCart.Read(HttpContext.Session);
         if (cart.Count != ticket.Lines.Count || ticket.Lines.Any(x =>
             !cart.TryGetValue(x.ProductId, out var qty) || qty != x.Quantity))
-            return BackToCart("Giỏ hàng đã thay đổi. Vui lòng kiểm tra và đặt lại.");
+            return BackToCart(StoreText.T("Giỏ hàng đã thay đổi. Vui lòng kiểm tra và đặt lại."));
 
         model.Lines = ticket.Lines;
         if (!ModelState.IsValid) return View(model);
@@ -158,7 +159,7 @@ public class OrdersController : Controller
                     line.Quantity > SessionCart.MaxQuantity || product.Price <= 0)
                 {
                     await transaction.RollbackAsync();
-                    return BackToCart("Sản phẩm hoặc giá bán đã thay đổi. Vui lòng kiểm tra lại giỏ.");
+                    return BackToCart(StoreText.T("Sản phẩm hoặc giá bán đã thay đổi. Vui lòng kiểm tra lại giỏ."));
                 }
                 var affected = await _db.Products.Where(x => x.Id == line.ProductId &&
                     x.IsActive && x.Price == product.Price && x.SalePrice == product.SalePrice && x.StockQuantity >= line.Quantity)
@@ -167,7 +168,7 @@ public class OrdersController : Controller
                 if (affected != 1)
                 {
                     await transaction.RollbackAsync();
-                    return BackToCart("Không đủ tồn kho hoặc giá đã thay đổi. Chưa tạo đơn; vui lòng kiểm tra lại giỏ.");
+                    return BackToCart(StoreText.T("Không đủ tồn kho hoặc giá đã thay đổi. Chưa tạo đơn; vui lòng kiểm tra lại giỏ."));
                 }
                 order.Items.Add(new OrderItem
                 {
@@ -180,7 +181,7 @@ public class OrdersController : Controller
             await _db.SaveChangesAsync();
             await transaction.CommitAsync();
             SessionCart.Write(HttpContext.Session, new());
-            TempData["OrderSuccess"] = "Đặt hàng thành công! Đơn đang chờ cửa hàng xác nhận.";
+            TempData["OrderSuccess"] = StoreText.T("Đặt hàng thành công! Đơn đang chờ cửa hàng xác nhận.");
             return RedirectToAction(nameof(Details), new { id = order.Id });
         }
         catch (DbUpdateException ex) when (ex.InnerException is SqlException sql && (sql.Number == 2601 || sql.Number == 2627))
@@ -193,7 +194,7 @@ public class OrdersController : Controller
         }
         catch (SqlException ex) when (ex.Number == 1205)
         {
-            return BackToCart("Có đơn khác đang cập nhật tồn kho. Vui lòng thử đặt lại.");
+            return BackToCart(StoreText.T("Có đơn khác đang cập nhật tồn kho. Vui lòng thử đặt lại."));
         }
     }
 

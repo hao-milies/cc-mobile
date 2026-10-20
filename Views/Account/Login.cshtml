@@ -1,7 +1,8 @@
-﻿@model CCMobile.ViewModels.LoginViewModel
+﻿@using CCMobile.Localization
+@model CCMobile.ViewModels.LoginViewModel
 
 @{
-    ViewData["Title"] = "Đăng nhập";
+    ViewData["Title"] = StoreText.T("Đăng nhập");
 }
 
 <div class="row justify-content-center py-5">
@@ -10,7 +11,7 @@
                  style="background: #f7f3e8;">
 
             <p class="small fw-bold mb-2">CC MOBILE</p>
-            <h1 class="h3 mb-4">Đăng nhập</h1>
+            <h1 class="h3 mb-4">@StoreText.T("Đăng nhập")</h1>
 
             @if (TempData["SuccessMessage"] is string message)
             {
@@ -60,16 +61,16 @@
 
                 <button type="submit"
                         class="btn btn-warning w-100 fw-semibold">
-                    Đăng nhập
+                    @StoreText.T("Đăng nhập")
                 </button>
             </form>
 
             <p class="mt-4 mb-0">
-                Chưa có tài khoản?
+                @StoreText.T("Chưa có tài khoản?")
                 <a asp-controller="Account"
                    asp-action="Register"
                    class="text-dark">
-                    Đăng ký
+                    @StoreText.T("Đăng ký")
                 </a>
             </p>
         </section>

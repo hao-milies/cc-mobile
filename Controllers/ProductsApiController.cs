@@ -1,4 +1,5 @@
-﻿using CCMobile.Data;
+﻿using CCMobile.Localization;
+using CCMobile.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -17,7 +18,7 @@ public class ProductsApiController(ShopDbContext db) : ControllerBase
     {
         search = search?.Trim() ?? "";
         if (search.Length > 100)
-            return BadRequest(new { message = "Từ khóa tối đa 100 ký tự." });
+            return BadRequest(new { message = StoreText.T("Từ khóa tối đa 100 ký tự.") });
         if (search.Length < 2)
             return Ok(new { items = Array.Empty<object>() });
 

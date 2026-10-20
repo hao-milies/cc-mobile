@@ -1,4 +1,5 @@
-﻿using CCMobile.Data;
+﻿using CCMobile.Localization;
+using CCMobile.Data;
 using CCMobile.Models;
 using CCMobile.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -49,7 +50,7 @@ namespace CCMobile.Controllers
             {
                 ModelState.AddModelError(
                     nameof(model.FullName),
-                    "Vui lòng nhập họ tên.");
+                    StoreText.T("Vui lòng nhập họ tên."));
 
                 return View(model);
             }
@@ -60,7 +61,7 @@ namespace CCMobile.Controllers
             {
                 ModelState.AddModelError(
                     nameof(model.Email),
-                    "Email này đã được đăng ký.");
+                    StoreText.T("Email này đã được đăng ký."));
 
                 return View(model);
             }
@@ -102,7 +103,7 @@ namespace CCMobile.Controllers
 
                 ModelState.AddModelError(
                     string.Empty,
-                    "Chưa thể hoàn tất đăng ký. Vui lòng thử lại sau.");
+                    StoreText.T("Chưa thể hoàn tất đăng ký. Vui lòng thử lại sau."));
 
                 return View(model);
             }
@@ -110,7 +111,7 @@ namespace CCMobile.Controllers
             await transaction.CommitAsync();
 
             TempData["SuccessMessage"] =
-                "Đăng ký thành công. Bạn có thể đăng nhập ngay.";
+                StoreText.T("Đăng ký thành công. Bạn có thể đăng nhập ngay.");
 
             return RedirectToAction(nameof(Login));
         }
@@ -141,7 +142,7 @@ namespace CCMobile.Controllers
             {
                 ModelState.AddModelError(
                     string.Empty,
-                    "Email hoặc mật khẩu không chính xác.");
+                    StoreText.T("Email hoặc mật khẩu không chính xác."));
 
                 return View(model);
             }
@@ -168,20 +169,20 @@ namespace CCMobile.Controllers
             {
                 ModelState.AddModelError(
                     string.Empty,
-                    "Tài khoản tạm khóa do đăng nhập sai nhiều lần. "
-                    + "Vui lòng thử lại sau 5 phút.");
+                    StoreText.T("Tài khoản tạm khóa do đăng nhập sai nhiều lần. ")
+                    + StoreText.T("Vui lòng thử lại sau 5 phút."));
             }
             else if (result.IsNotAllowed)
             {
                 ModelState.AddModelError(
                     string.Empty,
-                    "Tài khoản hiện chưa được phép đăng nhập.");
+                    StoreText.T("Tài khoản hiện chưa được phép đăng nhập."));
             }
             else
             {
                 ModelState.AddModelError(
                     string.Empty,
-                    "Email hoặc mật khẩu không chính xác.");
+                    StoreText.T("Email hoặc mật khẩu không chính xác."));
             }
 
             return View(model);

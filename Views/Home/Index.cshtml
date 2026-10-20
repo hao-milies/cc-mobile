@@ -1,8 +1,38 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@using System.Globalization
+@{
+    var english = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "en";
+    string Copy(string vi, string en) => english ? en : vi;
+    ViewData["Title"] = Copy("Chào mừng đến CC Mobile", "Welcome to CC Mobile");
 }
+<link rel="stylesheet" href="~/css/cc-home-retro.css" asp-append-version="true" />
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="retro-home">
+    <div class="retro-mastline"><span>CC MOBILE / @Copy("ĐIỆN THOẠI & PHỤ KIỆN", "PHONES & ACCESSORIES")</span><span>@Copy("MỜI BẠN GHÉ CHƠI", "COME ON IN") <span aria-hidden="true">↙</span></span></div>
+    <section class="retro-hero" aria-labelledby="retro-title">
+        <div class="retro-intro">
+            <p class="retro-label">@Copy("MỘT CUỘC GỌI. NHIỀU CÂU CHUYỆN.", "ONE CALL. A THOUSAND STORIES.")</p>
+            <h1 id="retro-title">@Copy("A LÔ.", "HELLO.")<br /><span>@Copy("ĐÚNG CHỖ", "RIGHT")</span><br />@Copy("RỒI ĐẤY.", "PLACE.")</h1>
+            <p class="retro-lead">@Copy("Máy mới cho những cuộc gọi quen.", "A new phone. The same familiar voices.")</p>
+            <p class="retro-description">@Copy("Một chiếc điện thoại để gọi về nhà, nghe bản nhạc thích, chụp một tấm hình đẹp. Ghé CC Mobile, tìm chiếc máy hợp với cách bạn sống mỗi ngày.", "A call home, a favourite song, a photo worth keeping. Find a phone at CC Mobile that fits your everyday life.")</p>
+            <a asp-controller="Products" asp-action="Index" class="retro-button">@Copy("Vào xem sản phẩm", "Browse the shop") <span aria-hidden="true">↗</span></a>
+            <div class="retro-signoff"><span aria-hidden="true">)))</span> @Copy("ĐIỆN THOẠI. PHỤ KIỆN. VÀ CHÚT HOÀI NIỆM.", "PHONES. ACCESSORIES. A LITTLE NOSTALGIA.")</div>
+        </div>
+        <figure class="retro-storefront">
+            <div class="retro-photo-frame"><img src="~/images/home-retro/storefront.jpg" alt="@Copy("Mặt tiền CC Mobile với bảng hiệu nhiều màu và chiếc xe vàng phía trước", "CC Mobile storefront with a colourful sign and a yellow car outside")" width="1920" height="1080" fetchpriority="high" /><span class="retro-open" aria-hidden="true">COME<br />ON IN! <span>↗</span></span></div>
+            <figcaption><span>01 / @Copy("GÓC PHỐ QUEN", "THE FAMILIAR CORNER")</span><span>CC MOBILE )))</span></figcaption>
+        </figure>
+    </section>
+
+    <div class="retro-strip" aria-hidden="true"><span>GOOD CALL.</span><span>✳</span><span>CC MOBILE</span><span>✳</span><span>GOOD CALL.</span></div>
+
+    <section class="retro-story" aria-labelledby="retro-story-title">
+        <div class="retro-story-title"><p class="retro-label">@Copy("CHUYỆN CỦA CỬA HÀNG", "A LITTLE ABOUT THE SHOP")</p><h2 id="retro-story-title">@Copy("Biển hiệu cũ.", "Old-school sign.")<br /><em>@Copy("Lựa chọn hôm nay.", "Present-day choices.")</em></h2></div>
+        <div class="retro-story-copy"><p>@Copy("CC Mobile mang dáng dấp của một tiệm điện thoại ven đường: bảng hiệu rực màu, vài dòng chữ viết thật lớn trên cửa kính, bước vào là thấy máy ngay trước mắt.", "CC Mobile takes its cues from the roadside phone shop: a colourful sign, oversized lettering on the windows, and phones waiting just inside.")</p><p>@Copy("Lên website cũng vậy. Bạn có thể xem thông số, lọc theo túi tiền, chọn phụ kiện rồi theo dõi đơn hàng. Mọi thứ ở ngay đây, cứ thong thả xem.", "The website keeps that same straightforward feel. Check the specifications, filter by budget, pick up accessories and follow your order. Take a look around.")</p></div>
+    </section>
+
+    <section class="retro-gallery" aria-label="@Copy("Hình ảnh cửa hàng", "Shop photographs")">
+        <figure class="retro-window"><img src="~/images/home-retro/privacy-window.jpg" alt="@Copy("Cửa kính CC Mobile với chữ Is the man listening? Privacy sold here", "CC Mobile windows with Is the man listening? Privacy sold here lettering")" width="950" height="534" loading="lazy" /><figcaption><span>02 / WINDOW SHOPPING</span><span>@Copy("Một tấm kính cũng thành áp phích.", "Even a window can be a poster.")</span></figcaption></figure>
+        <div class="retro-inside"><figure><img src="~/images/home-retro/inside.webp" alt="@Copy("Bên trong cửa hàng với quầy điện thoại và các kệ phụ kiện", "Inside the shop, with a phone counter and accessory displays")" width="474" height="266" loading="lazy" /><figcaption>03 / @Copy("PHÍA SAU CÁNH CỬA", "BEHIND THE DOOR")</figcaption></figure><div class="retro-note"><span class="retro-note-symbol" aria-hidden="true">✳</span><h3>@Copy("Cứ xem đã.", "Have a look.")</h3><p>@Copy("Xem kỹ cấu hình. Chọn đúng nhu cầu. Ưng chiếc nào, ghé trang chi tiết chiếc đó.", "Check the specs. Think about what you need. Something catches your eye? Open its product page.")</p><a asp-controller="Products" asp-action="Index">@Copy("Tìm chiếc máy của bạn", "Find your next phone") <span aria-hidden="true">↗</span></a></div></div>
+    </section>
+    <p class="retro-credit">@Copy("Cảm hứng hình ảnh: cửa hàng CC Mobile trong Better Call Saul. Hình ảnh và câu chữ trên biển hiệu là chất liệu điện ảnh, không phải cam kết bảo mật của website.", "Visual inspiration: the CC Mobile shop in Better Call Saul. The photographs and storefront slogans are cinematic references, not website privacy promises.")</p>
 </div>

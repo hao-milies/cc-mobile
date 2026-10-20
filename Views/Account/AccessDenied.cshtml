@@ -1,15 +1,16 @@
-﻿@{
-    ViewData["Title"] = "Không có quyền truy cập";
+﻿@using CCMobile.Localization
+@{
+    ViewData["Title"] = StoreText.T("Không có quyền truy cập");
 }
 
 <div class="py-5 text-center">
-    <h1 class="h3">Bạn không có quyền truy cập trang này</h1>
+    <h1 class="h3">@StoreText.T("Bạn không có quyền truy cập trang này")</h1>
     <p class="text-muted">
-        Tài khoản hiện tại không được phép thực hiện chức năng này.
+        @StoreText.T("Tài khoản hiện tại không được phép thực hiện chức năng này.")
     </p>
     <a asp-controller="Products"
        asp-action="Index"
        class="btn btn-warning">
-        Về cửa hàng
+        @StoreText.T("Về cửa hàng")
     </a>
 </div>

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using CCMobile.Localization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CCMobile.Data;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -85,9 +86,9 @@ namespace CCMobile.Controllers
             ViewBag.SortOptions = new SelectList(
                 new[]
                 {
-            new { Value = "newest", Text = "Mới nhất" },
-            new { Value = "price-asc", Text = "Giá tăng dần" },
-            new { Value = "price-desc", Text = "Giá giảm dần" }
+            new { Value = "newest", Text = StoreText.T("Mới nhất") },
+            new { Value = "price-asc", Text = StoreText.T("Giá tăng dần") },
+            new { Value = "price-desc", Text = StoreText.T("Giá giảm dần") }
                 },
                 "Value",
                 "Text",
@@ -95,9 +96,9 @@ namespace CCMobile.Controllers
 
             ViewBag.CategoryOptions = new SelectList(await _db.Categories.AsNoTracking().OrderBy(c => c.Name).ToListAsync(), "Id", "Name", categoryId);
             ViewBag.BudgetOptions = new SelectList(new[] {
-                new { Value = "under5", Text = "Dưới 5 triệu" },
-                new { Value = "5to10", Text = "5 đến dưới 10 triệu" },
-                new { Value = "10plus", Text = "Từ 10 triệu" }
+                new { Value = "under5", Text = StoreText.T("Dưới 5 triệu") },
+                new { Value = "5to10", Text = StoreText.T("5 đến dưới 10 triệu") },
+                new { Value = "10plus", Text = StoreText.T("Từ 10 triệu") }
             }, "Value", "Text", budget);
             ViewData["Search"] = search;
             ViewData["SaleOnly"] = saleOnly;

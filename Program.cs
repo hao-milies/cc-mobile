@@ -1,4 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Globalization;
+using Microsoft.AspNetCore.Localization;
+using CCMobile.Localization;
+using Microsoft.EntityFrameworkCore;
 using CCMobile.Data;
 using Microsoft.AspNetCore.Identity;
 using CCMobile.Models;
@@ -14,7 +17,21 @@ var connectionString =
 builder.Services.AddDbContext<ShopDbContext>(options =>
     options.UseSqlServer(connectionString));
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddLocalization();
+builder.Services.AddControllersWithViews()
+    .AddDataAnnotationsLocalization(options =>
+        options.DataAnnotationLocalizerProvider = (_, factory) => factory.Create(typeof(StoreText)));
+builder.Services.Configure<RequestLocalizationOptions>(options =>
+{
+    options.DefaultRequestCulture = new RequestCulture("vi-VN", "vi-VN");
+    // Keep VND, decimal input and date conventions stable; translate interface text only.
+    options.SupportedCultures = new[] { CultureInfo.GetCultureInfo("vi-VN") };
+    options.SupportedUICultures = new[] {
+        CultureInfo.GetCultureInfo("vi-VN"), CultureInfo.GetCultureInfo("en-US") };
+    options.RequestCultureProviders = new List<IRequestCultureProvider> {
+        new CookieRequestCultureProvider() };
+});
+
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
@@ -83,10 +100,13 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+app.UseRequestLocalization();
 app.UseRouting();
 app.UseSession();
 
 app.UseAuthentication();
+
+
 app.UseAuthorization();
 
 app.MapStaticAssets();

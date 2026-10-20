@@ -1,4 +1,5 @@
-﻿<link rel="stylesheet" href="~/css/cc-editor.css" asp-append-version="true" />
+﻿@using CCMobile.Localization
+<link rel="stylesheet" href="~/css/cc-editor.css" asp-append-version="true" />
 @model CCMobile.Models.Product
 @using System.Globalization
 
@@ -15,10 +16,10 @@
 }
 
 <div class="cc-details">
-    <nav aria-label="Đường dẫn" class="mb-4">
+    <nav aria-label="@StoreText.T("Đường dẫn")" class="mb-4">
         <a asp-controller="Products" asp-action="Index"
            class="cc-back">
-            ← Điện thoại và phụ kiện
+            ← @StoreText.T("Điện thoại và phụ kiện")
         </a>
     </nav>
 
@@ -35,7 +36,7 @@
                 else
                 {
                     <div class="cc-image-placeholder">
-                        Ảnh sản phẩm đang được cập nhật
+                        @StoreText.T("Ảnh sản phẩm đang được cập nhật")
                     </div>
                 }
             </div>
@@ -43,14 +44,14 @@
             @if (images.Count > 1)
             {
                 <div class="cc-thumbnails mt-3"
-                     aria-label="Ảnh sản phẩm">
+                     aria-label="@StoreText.T("Ảnh sản phẩm")">
                     @foreach (var image in images)
                     {
                         <button type="button"
                                 class="cc-thumbnail"
                                 data-image="@Url.Content(image.ImageUrl)"
                                 data-alt="@(image.AltText ?? Model.Name)"
-                                aria-label="Xem ảnh @(image.AltText ?? Model.Name)">
+                                aria-label="@StoreText.T("Xem ảnh") @(image.AltText ?? Model.Name)">
                             <img src="@Url.Content(image.ImageUrl)"
                                  alt=""
                                  loading="lazy" />
@@ -63,7 +64,7 @@
         <div class="col-lg-5">
             <p class="cc-eyebrow">@Model.Brand.Name</p>
             <h1 class="cc-product-title">@Model.Name</h1>
-            <p class="text-muted small">Mã sản phẩm: @Model.Sku</p>
+            <p class="text-muted small">@StoreText.T("Mã sản phẩm:") @Model.Sku</p>
 
             <p class="cc-price">
                 @Model.EffectivePrice.ToString("N0", culture) ₫
@@ -73,17 +74,17 @@
             {
                 <div class="cc-detail-discount mb-3">
                     <del>@Model.Price.ToString("N0", culture) ₫</del>
-                    <span class="cc-sale-pill">@(Model.DiscountPercent > 0 ? "Giảm " + Model.DiscountPercent.ToString("0.#", culture) + "%" : "Giá khuyến mại")</span>
-                    <p class="small mb-0 mt-2">Tiết kiệm @((Model.Price - Model.EffectivePrice).ToString("N0", culture)) ₫</p>
+                    <span class="cc-sale-pill">@(Model.DiscountPercent > 0 ? StoreText.T("Giảm ") + Model.DiscountPercent.ToString("0.#", culture) + "%" : StoreText.T("Giá khuyến mại"))</span>
+                    <p class="small mb-0 mt-2">@StoreText.T("Tiết kiệm") @((Model.Price - Model.EffectivePrice).ToString("N0", culture)) ₫</p>
                 </div>
             }
             @if (Model.StockQuantity > 0)
             {
-                <span class="cc-stock">Còn hàng</span>
+                <span class="cc-stock">@StoreText.T("Còn hàng")</span>
             }
             else
             {
-                <span class="cc-stock cc-stock-out">Tạm hết hàng</span>
+                <span class="cc-stock cc-stock-out">@StoreText.T("Tạm hết hàng")</span>
             }
 
             @if (!string.IsNullOrWhiteSpace(Model.ShortDescription))
@@ -93,31 +94,31 @@
 
             <dl class="cc-facts">
                 <div>
-                    <dt>Danh mục</dt>
+                    <dt>@StoreText.T("Danh mục")</dt>
                     <dd>@Model.Category.Name</dd>
                 </div>
 
                 @if (!string.IsNullOrWhiteSpace(Model.Color))
                 {
                     <div>
-                        <dt>Màu sắc</dt>
+                        <dt>@StoreText.T("Màu sắc")</dt>
                         <dd>@Model.Color</dd>
                     </div>
                 }
 
                 <div>
-                    <dt>Bảo hành</dt>
+                    <dt>@StoreText.T("Bảo hành")</dt>
                     <dd>
                         @(Model.WarrantyMonths > 0
-                            ? $"{Model.WarrantyMonths} tháng"
-                            : "Không áp dụng")
+                            ? StoreText.F("{0} tháng", Model.WarrantyMonths)
+                            : StoreText.T("Không áp dụng"))
                     </dd>
                 </div>
             </dl>
 
             @if (User.IsInRole("Admin"))
             {
-                <a asp-controller="AdminProducts" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning my-4">Chỉnh sửa sản phẩm</a>
+                <a asp-controller="AdminProducts" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning my-4">@StoreText.T("Chỉnh sửa sản phẩm")</a>
             }
             else
             {
@@ -125,27 +126,27 @@
             {
                 <form asp-controller="Cart" asp-action="Add" method="post" class="my-4">
                     <input type="hidden" name="productId" value="@Model.Id" />
-                    <label for="cart-quantity" class="form-label">Số lượng</label>
+                    <label for="cart-quantity" class="form-label">@StoreText.T("Số lượng")</label>
                     <div class="d-flex gap-3">
                         <input id="cart-quantity" name="quantity" type="number" value="1"
                                min="1" max="@Math.Min(Model.StockQuantity, 99)" step="1" required
                                class="form-control" style="width: 90px;" />
                         <button type="submit" class="btn btn-warning fw-semibold flex-grow-1">
-                            Thêm vào giỏ hàng
+                            @StoreText.T("Thêm vào giỏ hàng")
                         </button>
                     </div>
                 </form>
             }
             else
             {
-                <button type="button" class="btn btn-secondary w-100 my-4" disabled>Tạm hết hàng</button>
+                <button type="button" class="btn btn-secondary w-100 my-4" disabled>@StoreText.T("Tạm hết hàng")</button>
             }
             }
 
             @if (specs != null)
             {
                 <a href="#specifications" class="cc-yellow-button">
-                    Xem thông số kỹ thuật ↓
+                    @StoreText.T("Xem thông số kỹ thuật") ↓
                 </a>
             }
         </div>
@@ -154,7 +155,7 @@
     @if (!string.IsNullOrWhiteSpace(Model.Description))
     {
         <section class="cc-section">
-            <h2 class="cc-section-title">Về sản phẩm</h2>
+            <h2 class="cc-section-title">@StoreText.T("Về sản phẩm")</h2>
             <div class="cc-description cc-rich-description">@CCMobile.Infrastructure.ProductDescription.Render(Model.Description)</div>
         </section>
     }
@@ -162,16 +163,16 @@
     @if (specs != null)
     {
         <section id="specifications" class="cc-section">
-            <h2 class="cc-section-title">Thông số kỹ thuật</h2>
+            <h2 class="cc-section-title">@StoreText.T("Thông số kỹ thuật")</h2>
 
             <div class="table-responsive">
                 <table class="table cc-spec-table mb-0">
                     <caption class="visually-hidden">
-                        Thông số kỹ thuật của @Model.Name
+                        @StoreText.F("Thông số kỹ thuật của {0}", Model.Name)
                     </caption>
                     <tbody>
                         <tr>
-                            <th scope="row">Chip xử lý</th>
+                            <th scope="row">@StoreText.T("Chip xử lý")</th>
                             <td>@specs.Chipset</td>
                         </tr>
                         <tr>
@@ -179,50 +180,50 @@
                             <td>@specs.RamGb GB</td>
                         </tr>
                         <tr>
-                            <th scope="row">Bộ nhớ</th>
+                            <th scope="row">@StoreText.T("Bộ nhớ")</th>
                             <td>@specs.StorageGb GB</td>
                         </tr>
                         <tr>
-                            <th scope="row">Màn hình</th>
+                            <th scope="row">@StoreText.T("Màn hình")</th>
                             <td>
                                 @specs.ScreenSizeInches.ToString("0.#", culture) inch
                             </td>
                         </tr>
                         <tr>
-                            <th scope="row">Độ phân giải</th>
-                            <td>@(specs.ScreenResolution ?? "Đang cập nhật")</td>
+                            <th scope="row">@StoreText.T("Độ phân giải")</th>
+                            <td>@(specs.ScreenResolution ?? StoreText.T("Đang cập nhật"))</td>
                         </tr>
                         <tr>
-                            <th scope="row">Tấm nền</th>
-                            <td>@(specs.PanelType ?? "Đang cập nhật")</td>
+                            <th scope="row">@StoreText.T("Tấm nền")</th>
+                            <td>@(specs.PanelType ?? StoreText.T("Đang cập nhật"))</td>
                         </tr>
                         <tr>
-                            <th scope="row">Tần số quét</th>
-                            <td>@(specs.RefreshRateHz?.ToString() is string hz ? $"{hz} Hz" : "Đang cập nhật")</td>
+                            <th scope="row">@StoreText.T("Tần số quét")</th>
+                            <td>@(specs.RefreshRateHz?.ToString() is string hz ? $"{hz} Hz" : StoreText.T("Đang cập nhật"))</td>
                         </tr>
                         <tr>
-                            <th scope="row">Camera sau</th>
-                            <td>@(specs.RearCamera ?? "Đang cập nhật")</td>
+                            <th scope="row">@StoreText.T("Camera sau")</th>
+                            <td>@(specs.RearCamera ?? StoreText.T("Đang cập nhật"))</td>
                         </tr>
                         <tr>
-                            <th scope="row">Camera trước</th>
-                            <td>@(specs.FrontCamera ?? "Đang cập nhật")</td>
+                            <th scope="row">@StoreText.T("Camera trước")</th>
+                            <td>@(specs.FrontCamera ?? StoreText.T("Đang cập nhật"))</td>
                         </tr>
                         <tr>
-                            <th scope="row">Dung lượng pin</th>
-                            <td>@(specs.BatteryMah.HasValue ? $"{specs.BatteryMah} mAh" : "Đang cập nhật")</td>
+                            <th scope="row">@StoreText.T("Dung lượng pin")</th>
+                            <td>@(specs.BatteryMah.HasValue ? $"{specs.BatteryMah} mAh" : StoreText.T("Đang cập nhật"))</td>
                         </tr>
                         <tr>
-                            <th scope="row">Công suất sạc</th>
-                            <td>@(specs.ChargingWatts.HasValue ? $"{specs.ChargingWatts} W" : "Đang cập nhật")</td>
+                            <th scope="row">@StoreText.T("Công suất sạc")</th>
+                            <td>@(specs.ChargingWatts.HasValue ? $"{specs.ChargingWatts} W" : StoreText.T("Đang cập nhật"))</td>
                         </tr>
                         <tr>
-                            <th scope="row">Hệ điều hành</th>
-                            <td>@(specs.OperatingSystem ?? "Đang cập nhật")</td>
+                            <th scope="row">@StoreText.T("Hệ điều hành")</th>
+                            <td>@(specs.OperatingSystem ?? StoreText.T("Đang cập nhật"))</td>
                         </tr>
                         <tr>
-                            <th scope="row">Khối lượng</th>
-                            <td>@(specs.WeightGrams.HasValue ? $"{specs.WeightGrams.Value.ToString("0.#", culture)} g" : "Đang cập nhật")</td>
+                            <th scope="row">@StoreText.T("Khối lượng")</th>
+                            <td>@(specs.WeightGrams.HasValue ? $"{specs.WeightGrams.Value.ToString("0.#", culture)} g" : StoreText.T("Đang cập nhật"))</td>
                         </tr>
                     </tbody>
                 </table>

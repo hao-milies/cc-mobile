@@ -1,11 +1,12 @@
-﻿@model CCMobile.ViewModels.CartViewModel
+﻿@using CCMobile.Localization
+@model CCMobile.ViewModels.CartViewModel
 @using System.Globalization
 @{
-    ViewData["Title"] = "Giỏ hàng";
+    ViewData["Title"] = StoreText.T("Giỏ hàng");
     var culture = CultureInfo.GetCultureInfo("vi-VN");
 }
 <div class="py-4">
-    <h1 class="h3">Giỏ hàng</h1>
+    <h1 class="h3">@StoreText.T("Giỏ hàng")</h1>
     @if (TempData["CartSuccess"] is string success)
     {
         <div class="alert alert-success" role="status">@success</div>
@@ -20,20 +21,20 @@
     }
     @if (!Model.Items.Any())
     {
-        <p class="text-muted my-4">Giỏ hàng chưa có sản phẩm.</p>
-        <a asp-controller="Products" asp-action="Index" class="btn btn-warning">Khám phá sản phẩm</a>
+        <p class="text-muted my-4">@StoreText.T("Giỏ hàng chưa có sản phẩm.")</p>
+        <a asp-controller="Products" asp-action="Index" class="btn btn-warning">@StoreText.T("Khám phá sản phẩm")</a>
     }
     else
     {
-        <p class="text-muted">@Model.Items.Count loại sản phẩm · @Model.TotalQuantity sản phẩm</p>
+        <p class="text-muted">@Model.Items.Count @StoreText.T("loại sản phẩm") · @Model.TotalQuantity @StoreText.T("ProductCountLabel")</p>
         <div class="table-responsive">
             <table class="table align-middle">
                 <thead><tr>
-                    <th scope="col">Sản phẩm</th>
-                    <th scope="col">Đơn giá</th>
-                    <th scope="col">Số lượng</th>
-                    <th scope="col">Thành tiền</th>
-                    <th scope="col">Thao tác</th>
+                    <th scope="col">@StoreText.T("Sản phẩm")</th>
+                    <th scope="col">@StoreText.T("Đơn giá")</th>
+                    <th scope="col">@StoreText.T("Số lượng")</th>
+                    <th scope="col">@StoreText.T("Thành tiền")</th>
+                    <th scope="col">@StoreText.T("Thao tác")</th>
                 </tr></thead>
                 <tbody>
                 @foreach (var item in Model.Items)
@@ -59,9 +60,9 @@
                                 <input type="hidden" name="productId" value="@item.ProductId" />
                                 <input type="number" name="quantity" value="@item.Quantity"
                                        min="1" max="@item.MaxQuantity" step="1" required
-                                       aria-label="Số lượng @item.Name"
+                                       aria-label="@StoreText.T("Số lượng") @item.Name"
                                        class="form-control" style="width: 85px;" />
-                                <button type="submit" class="btn btn-sm btn-outline-dark text-nowrap">Cập nhật</button>
+                                <button type="submit" class="btn btn-sm btn-outline-dark text-nowrap">@StoreText.T("Cập nhật")</button>
                             </form>
                         </td>
                         <td class="fw-semibold text-nowrap">@item.Subtotal.ToString("N0", culture) ₫</td>
@@ -69,7 +70,7 @@
                             <form asp-action="Remove" method="post">
                                 <input type="hidden" name="productId" value="@item.ProductId" />
                                 <button type="submit" class="btn btn-sm btn-outline-danger"
-                                        aria-label="Xóa @item.Name khỏi giỏ">Xóa</button>
+                                        aria-label="@StoreText.T("Xóa") @item.Name @StoreText.T("khỏi giỏ")">@StoreText.T("Xóa")</button>
                             </form>
                         </td>
                     </tr>
@@ -78,14 +79,14 @@
             </table>
         </div>
         <div class="text-end my-4">
-            <p class="fs-5 fw-semibold">Tạm tính: @Model.Total.ToString("N0", culture) ₫</p>
-            <p class="text-muted small">Giá và tồn kho có thể thay đổi. Thêm vào giỏ chưa giữ hàng.</p>
+            <p class="fs-5 fw-semibold">@StoreText.T("Tạm tính:") @Model.Total.ToString("N0", culture) ₫</p>
+            <p class="text-muted small">@StoreText.T("Giá và tồn kho có thể thay đổi. Thêm vào giỏ chưa giữ hàng.")</p>
         </div>
         <div class="d-flex flex-wrap gap-3">
-            <a asp-controller="Orders" asp-action="Checkout" class="btn btn-dark">Tiến hành đặt hàng</a>
-            <a asp-controller="Products" asp-action="Index" class="btn btn-warning">Tiếp tục mua sắm</a>
-            <form asp-action="Clear" method="post" onsubmit="return confirm('Xóa tất cả sản phẩm khỏi giỏ?');">
-                <button type="submit" class="btn btn-outline-danger">Xóa giỏ hàng</button>
+            <a asp-controller="Orders" asp-action="Checkout" class="btn btn-dark">@StoreText.T("Tiến hành đặt hàng")</a>
+            <a asp-controller="Products" asp-action="Index" class="btn btn-warning">@StoreText.T("Tiếp tục mua sắm")</a>
+            <form asp-action="Clear" method="post" data-confirm="@StoreText.T("Xóa tất cả sản phẩm khỏi giỏ?")" onsubmit="return confirm(this.dataset.confirm);">
+                <button type="submit" class="btn btn-outline-danger">@StoreText.T("Xóa giỏ hàng")</button>
             </form>
         </div>
     }

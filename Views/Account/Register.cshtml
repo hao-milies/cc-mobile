@@ -1,7 +1,8 @@
-﻿@model CCMobile.ViewModels.RegisterViewModel
+﻿@using CCMobile.Localization
+@model CCMobile.ViewModels.RegisterViewModel
 
 @{
-    ViewData["Title"] = "Đăng ký tài khoản";
+    ViewData["Title"] = StoreText.T("Đăng ký tài khoản");
 }
 
 <div class="row justify-content-center py-5">
@@ -10,9 +11,9 @@
                  style="background: #f7f3e8;">
 
             <p class="small fw-bold mb-2">CC MOBILE</p>
-            <h1 class="h3 mb-2">Tạo tài khoản</h1>
+            <h1 class="h3 mb-2">@StoreText.T("Tạo tài khoản")</h1>
             <p class="text-muted mb-4">
-                Đăng ký để mua sắm và theo dõi đơn hàng.
+                @StoreText.T("Đăng ký để mua sắm và theo dõi đơn hàng.")
             </p>
 
             <form asp-controller="Account"
@@ -52,8 +53,8 @@
                            autocomplete="new-password"
                            aria-describedby="password-help" />
                     <div id="password-help" class="form-text">
-                        Từ 8 đến 100 ký tự, có chữ hoa,
-                        chữ thường và chữ số.
+                        @StoreText.T("Từ 8 đến 100 ký tự, có chữ hoa,")
+                        @StoreText.T("chữ thường và chữ số.")
                     </div>
                     <span asp-validation-for="Password"
                           class="text-danger small"></span>
@@ -71,14 +72,14 @@
 
                 <button type="submit"
                         class="btn btn-warning w-100 fw-semibold">
-                    Đăng ký
+                    @StoreText.T("Đăng ký")
                 </button>
             </form>
 
             <a asp-controller="Products"
                asp-action="Index"
                class="d-inline-block mt-4 text-dark">
-                ← Quay lại cửa hàng
+                ← @StoreText.T("Quay lại cửa hàng")
             </a>
         </section>
     </div>

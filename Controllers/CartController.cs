@@ -1,4 +1,5 @@
-﻿using CCMobile.Data;
+﻿using CCMobile.Localization;
+using CCMobile.Data;
 using CCMobile.Services;
 using CCMobile.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -26,7 +27,7 @@ namespace CCMobile.Controllers
             var model = new CartViewModel
             {
                 Notice = changed
-                    ? "Giỏ hàng đã được cập nhật theo tình trạng bán và tồn kho hiện tại. Vui lòng kiểm tra lại."
+                    ? StoreText.T("Giỏ hàng đã được cập nhật theo tình trạng bán và tồn kho hiện tại. Vui lòng kiểm tra lại.")
                     : null,
                 Items = cart.Select(entry =>
                 {
@@ -53,26 +54,26 @@ namespace CCMobile.Controllers
         public async Task<IActionResult> Add(int productId, int quantity = 1)
         {
             if (!ModelState.IsValid || quantity < 1 || quantity > SessionCart.MaxQuantity)
-                return CartError("Số lượng phải là số nguyên từ 1 đến 99.");
+                return CartError(StoreText.T("Số lượng phải là số nguyên từ 1 đến 99."));
 
             var product = await _db.Products.AsNoTracking()
                 .FirstOrDefaultAsync(p => p.Id == productId);
             if (product == null || !product.IsActive || product.StockQuantity <= 0 || product.Price <= 0)
-                return CartError("Sản phẩm hiện không thể thêm vào giỏ hàng.");
+                return CartError(StoreText.T("Sản phẩm hiện không thể thêm vào giỏ hàng."));
 
             await HttpContext.Session.LoadAsync();
             var cart = SessionCart.Read(HttpContext.Session);
             if (!cart.ContainsKey(productId) && cart.Count >= SessionCart.MaxLines)
-                return CartError("Giỏ hàng tối đa 50 loại sản phẩm. Hãy bỏ bớt sản phẩm trước khi thêm.");
+                return CartError(StoreText.T("Giỏ hàng tối đa 50 loại sản phẩm. Hãy bỏ bớt sản phẩm trước khi thêm."));
 
             var current = cart.GetValueOrDefault(productId);
             var total = (long)current + quantity;
             if (total > Math.Min(product.StockQuantity, SessionCart.MaxQuantity))
-                return CartError("Số lượng trong giỏ vượt tồn kho hoặc giới hạn 99 sản phẩm mỗi loại.");
+                return CartError(StoreText.T("Số lượng trong giỏ vượt tồn kho hoặc giới hạn 99 sản phẩm mỗi loại."));
 
             cart[productId] = (int)total;
             SessionCart.Write(HttpContext.Session, cart);
-            TempData["CartSuccess"] = "Đã thêm sản phẩm vào giỏ hàng.";
+            TempData["CartSuccess"] = StoreText.T("Đã thêm sản phẩm vào giỏ hàng.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -81,12 +82,12 @@ namespace CCMobile.Controllers
         public async Task<IActionResult> Update(int productId, int quantity)
         {
             if (!ModelState.IsValid || quantity < 1 || quantity > SessionCart.MaxQuantity)
-                return CartError("Số lượng phải là số nguyên từ 1 đến 99. Dùng nút Xóa nếu không muốn mua.");
+                return CartError(StoreText.T("Số lượng phải là số nguyên từ 1 đến 99. Dùng nút Xóa nếu không muốn mua."));
 
             await HttpContext.Session.LoadAsync();
             var cart = SessionCart.Read(HttpContext.Session);
             if (!cart.ContainsKey(productId))
-                return CartError("Sản phẩm không còn trong giỏ hàng.");
+                return CartError(StoreText.T("Sản phẩm không còn trong giỏ hàng."));
 
             var product = await _db.Products.AsNoTracking()
                 .FirstOrDefaultAsync(p => p.Id == productId);
@@ -94,14 +95,14 @@ namespace CCMobile.Controllers
             {
                 cart.Remove(productId);
                 SessionCart.Write(HttpContext.Session, cart);
-                return CartError("Sản phẩm đã ngừng bán hoặc hết hàng và được bỏ khỏi giỏ.");
+                return CartError(StoreText.T("Sản phẩm đã ngừng bán hoặc hết hàng và được bỏ khỏi giỏ."));
             }
             if (quantity > product.StockQuantity)
-                return CartError("Số lượng yêu cầu vượt số lượng còn trong kho.");
+                return CartError(StoreText.T("Số lượng yêu cầu vượt số lượng còn trong kho."));
 
             cart[productId] = quantity;
             SessionCart.Write(HttpContext.Session, cart);
-            TempData["CartSuccess"] = "Đã cập nhật số lượng.";
+            TempData["CartSuccess"] = StoreText.T("Đã cập nhật số lượng.");
             return RedirectToAction(nameof(Index));
         }
 

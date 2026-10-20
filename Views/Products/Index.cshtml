@@ -1,7 +1,8 @@
-﻿@model IEnumerable<CCMobile.Models.Product>
+﻿@using CCMobile.Localization
+@model IEnumerable<CCMobile.Models.Product>
 @using System.Globalization
 @{
-    ViewData["Title"] = "Điện thoại và phụ kiện";
+    ViewData["Title"] = StoreText.T("Điện thoại và phụ kiện");
     var culture = CultureInfo.GetCultureInfo("vi-VN");
     var saleOnly = ViewData["SaleOnly"] is true;
     var hasFilters = new[] { "search", "brandId", "categoryId", "budget", "sort" }
@@ -10,29 +11,29 @@
 @if (TempData["SuccessMessage"] is string success) { <div class="alert alert-success">@success</div> }
 <section class="cc-deal-hero">
     <div class="cc-deal-copy">
-        <p class="cc-kicker">CC MOBILE / ĐIỆN THOẠI & PHỤ KIỆN</p>
-        <h1>Chọn máy đúng gu.<br /><span>Giá hợp túi tiền.</span></h1>
-        <p>Điện thoại, phụ kiện và những lựa chọn dành cho bạn.</p>
+        <p class="cc-kicker">@StoreText.T("CC MOBILE / ĐIỆN THOẠI & PHỤ KIỆN")</p>
+        <h1>@StoreText.T("Chọn máy đúng gu.")<br /><span>@StoreText.T("Giá hợp túi tiền.")</span></h1>
+        <p>@StoreText.T("Điện thoại, phụ kiện và những lựa chọn dành cho bạn.")</p>
     </div>
     <div class="cc-deal-art" aria-hidden="true">
         <span class="cc-deal-orbit">CC / MOBILE</span>
-        <div class="cc-deal-ticket"><small>CHỌN CHẤT RIÊNG</small><strong>GOOD<br />CALL!</strong><span>ĐIỆN THOẠI + PHỤ KIỆN</span></div>
+        <div class="cc-deal-ticket"><small>@StoreText.T("CHỌN CHẤT RIÊNG")</small><strong>GOOD<br />CALL!</strong><span>@StoreText.T("ĐIỆN THOẠI + PHỤ KIỆN")</span></div>
         <span class="cc-deal-star">✦</span>
     </div>
 </section>
 <section id="catalogue" class="cc-catalogue-section">
     <div class="cc-catalogue-title">
-        <h2>@(saleOnly ? "Sản phẩm khuyến mại" : "Điện thoại & phụ kiện")</h2>
-        <span>@Model.Count() sản phẩm</span>
+        <h2>@(saleOnly ? StoreText.T("Sản phẩm khuyến mại") : StoreText.T("CatalogueHeading"))</h2>
+        <span>@Model.Count() @StoreText.T("ProductCountLabel")</span>
     </div>
     <form asp-controller="Products" asp-action="Index" method="get" class="cc-filters">
         <input type="hidden" name="search" value="@ViewData["Search"]" />
         <div class="row g-2 align-items-end">
-            <div class="col-6 col-lg-3"><label for="brand-filter" class="form-label">Thương hiệu</label><select id="brand-filter" name="brandId" asp-items="ViewBag.BrandOptions" class="form-select"><option value="">Tất cả thương hiệu</option></select></div>
-            <div class="col-6 col-lg-2"><label for="category-filter" class="form-label">Danh mục</label><select id="category-filter" name="categoryId" asp-items="ViewBag.CategoryOptions" class="form-select"><option value="">Tất cả danh mục</option></select></div>
-            <div class="col-6 col-lg-3"><label for="budget-filter" class="form-label">Khoảng giá</label><select id="budget-filter" name="budget" asp-items="ViewBag.BudgetOptions" class="form-select"><option value="">Mọi mức giá</option></select></div>
-            <div class="col-6 col-lg-2"><label for="sort-filter" class="form-label">Sắp xếp</label><select id="sort-filter" name="sort" asp-items="ViewBag.SortOptions" class="form-select"></select></div>
-            <div class="col-12 col-lg-2"><button class="btn btn-warning w-100" type="submit">Áp dụng</button></div>
+            <div class="col-6 col-lg-3"><label for="brand-filter" class="form-label">@StoreText.T("Thương hiệu")</label><select id="brand-filter" name="brandId" asp-items="ViewBag.BrandOptions" class="form-select"><option value="">@StoreText.T("Tất cả thương hiệu")</option></select></div>
+            <div class="col-6 col-lg-2"><label for="category-filter" class="form-label">@StoreText.T("Danh mục")</label><select id="category-filter" name="categoryId" asp-items="ViewBag.CategoryOptions" class="form-select"><option value="">@StoreText.T("Tất cả danh mục")</option></select></div>
+            <div class="col-6 col-lg-3"><label for="budget-filter" class="form-label">@StoreText.T("Khoảng giá")</label><select id="budget-filter" name="budget" asp-items="ViewBag.BudgetOptions" class="form-select"><option value="">@StoreText.T("Mọi mức giá")</option></select></div>
+            <div class="col-6 col-lg-2"><label for="sort-filter" class="form-label">@StoreText.T("Sắp xếp")</label><select id="sort-filter" name="sort" asp-items="ViewBag.SortOptions" class="form-select"></select></div>
+            <div class="col-12 col-lg-2"><button class="btn btn-warning w-100" type="submit">@StoreText.T("Áp dụng")</button></div>
         </div>
         @if (saleOnly)
         {
@@ -42,14 +43,14 @@
         {
             <div class="d-flex justify-content-between flex-wrap gap-2 mt-3 small">
                 @if (ViewData["Search"] is string term && !string.IsNullOrWhiteSpace(term))
-                { <span>Kết quả cho “@term”</span> }
-                <a asp-action="Index" asp-route-saleOnly="@(saleOnly ? "true" : null)" class="ms-auto">Xóa bộ lọc</a>
+                { <span>@StoreText.T("Kết quả cho") “@term”</span> }
+                <a asp-action="Index" asp-route-saleOnly="@(saleOnly ? "true" : null)" class="ms-auto">@StoreText.T("Xóa bộ lọc")</a>
             </div>
         }
     </form>
     @if (!Model.Any())
     {
-        <div class="alert alert-light border p-4"><h3 class="h5">Chưa tìm thấy sản phẩm phù hợp</h3><p>Thử đổi bộ lọc hoặc tìm một tên sản phẩm khác.</p></div>
+        <div class="alert alert-light border p-4"><h3 class="h5">@StoreText.T("Chưa tìm thấy sản phẩm phù hợp")</h3><p>@StoreText.T("Thử đổi bộ lọc hoặc tìm một tên sản phẩm khác.")</p></div>
     }
     else
     {
@@ -58,9 +59,9 @@
         {
             var cover = product.Images.OrderByDescending(x => x.IsPrimary).ThenBy(x => x.DisplayOrder).FirstOrDefault();
             <article class="cc-product-card @(product.HasDiscount ? "cc-on-sale" : "")">
-                <a asp-action="Details" asp-route-id="@product.Id" class="cc-card-image" aria-label="Xem @product.Name">
+                <a asp-action="Details" asp-route-id="@product.Id" class="cc-card-image" aria-label="@StoreText.T("Xem ")@product.Name">
                     @if (cover != null) { <img src="@Url.Content(cover.ImageUrl)" alt="@(cover.AltText ?? product.Name)" loading="lazy" width="300" height="200" /> }
-                    else { <span>Ảnh đang cập nhật</span> }
+                    else { <span>@StoreText.T("Ảnh đang cập nhật")</span> }
                 </a>
                 <div class="cc-card-body">
                     <p class="cc-card-brand">@product.Brand.Name</p>
@@ -71,14 +72,14 @@
                             <p class="cc-card-price">@product.EffectivePrice.ToString("N0", culture) <span class="cc-currency">₫</span></p>
                             @if (product.HasDiscount)
                             {
-                                <span class="cc-price-stamp">@(product.DiscountPercent > 0 ? "−" + product.DiscountPercent.ToString("0.#", culture) + "%" : "Ưu đãi")</span>
+                                <span class="cc-price-stamp">@(product.DiscountPercent > 0 ? "−" + product.DiscountPercent.ToString("0.#", culture) + "%" : StoreText.T("Ưu đãi"))</span>
                             }
                         </div>
                         @if (product.HasDiscount)
-                        { <p class="cc-card-was"><del>@product.Price.ToString("N0", culture) ₫</del><span>Giá gốc</span></p> }
-                        <span class="cc-card-stock">@(product.StockQuantity > 0 ? "● Còn hàng" : "Tạm hết hàng")</span>
+                        { <p class="cc-card-was"><del>@product.Price.ToString("N0", culture) ₫</del><span>@StoreText.T("Giá gốc")</span></p> }
+                        <span class="cc-card-stock">@(product.StockQuantity > 0 ? StoreText.T("● Còn hàng") : StoreText.T("Tạm hết hàng"))</span>
                     </div></div>
-                    <a asp-action="Details" asp-route-id="@product.Id" class="cc-card-cta">Xem sản phẩm <span aria-hidden="true">↗</span></a>
+                    <a asp-action="Details" asp-route-id="@product.Id" class="cc-card-cta">@StoreText.T("Xem sản phẩm") <span aria-hidden="true">↗</span></a>
                 </div>
             </article>
         }
